@@ -536,7 +536,6 @@ function openCounterSheet(id){
   syncSwatches();
   $("cEditExtras").hidden = !c;
   openSheet($("sheetCounter"));
-  setTimeout(function(){ $("cName").focus(); }, 180);
 }
 $("cCustom").addEventListener("input", function(e){ pickedColor = e.target.value; syncSwatches(); });
 $("cCancel").addEventListener("click", closeSheet);
@@ -618,7 +617,6 @@ $("tapReset").addEventListener("click", function(){
 $("tapLabel").addEventListener("click", function(){
   $("lName").value = state.tap.label || "";
   openSheet($("sheetLabel"));
-  setTimeout(function(){ $("lName").focus(); $("lName").select(); }, 180);
 });
 $("lSave").addEventListener("click", function(){
   state.tap.label = $("lName").value.trim();
