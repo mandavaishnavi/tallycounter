@@ -63,7 +63,9 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .screen{flex:1;min-height:0;display:none;flex-direction:column}
 .screen.active{display:flex}
 
-.labelrow{display:flex;justify-content:center;padding:2px 14px 0}
+.labelrow{display:flex;justify-content:center;align-items:center;gap:2px;padding:2px 14px 0}
+.resetbtn{font-size:14px;opacity:.75}
+.resetbtn.arm{color:var(--danger);opacity:1}
 .labelbtn{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:15px;font-weight:600;
   padding:6px 12px;border-radius:999px}
 .labelbtn:hover{color:var(--ink)}
@@ -189,6 +191,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
         <span id="tapLabelText">Add a name</span>
         <svg viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16v4z"/></svg>
       </button>
+      <button class="labelbtn resetbtn" id="tapReset" hidden>Reset</button>
     </div>
     <button class="tapzone" id="tapzone" aria-label="Add one">
       <div class="count" id="tapCount">0</div>
@@ -378,6 +381,12 @@ function renderTap(){
   $("tapCount").textContent = state.tap.value;
   $("tapLabelText").textContent = state.tap.label || "Add a name";
   renderMarks($("tapMarks"), state.tap.value);
+  var rb = $("tapReset");
+  if (rb){
+    var show = state.tap.value > 0;
+    if (!show && !rb.hidden) disarmReset();
+    rb.hidden = !show;
+  }
 }
 function tint(hex, alpha){
   var h = hex.replace("#","");
@@ -589,6 +598,22 @@ function commitSave(reset){
 $("sSaveKeep").addEventListener("click", function(){ commitSave(false); });
 $("sSaveReset").addEventListener("click", function(){ commitSave(true); });
 $("sCancel").addEventListener("click", closeSheet);
+
+var resetArmed = null;
+function disarmReset(){
+  clearTimeout(resetArmed); resetArmed = null;
+  var b = $("tapReset"); b.classList.remove("arm"); b.textContent = "Reset";
+}
+$("tapReset").addEventListener("click", function(){
+  var b = $("tapReset");
+  if (!resetArmed){
+    b.classList.add("arm"); b.textContent = "Tap again to reset";
+    resetArmed = setTimeout(disarmReset, 3000);
+    return;
+  }
+  disarmReset();
+  state.tap.value = 0; renderTap(); touch(); toast("Count reset to zero");
+});
 
 $("tapLabel").addEventListener("click", function(){
   $("lName").value = state.tap.label || "";
