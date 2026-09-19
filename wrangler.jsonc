@@ -1,6 +1,6 @@
 {
   // Must match your existing Worker's name, or the deploy creates a second Worker.
-  "name": "tally",
+  "name": "tallycounter",
   "main": "src/worker.js",
   "compatibility_date": "2026-09-01",
 
