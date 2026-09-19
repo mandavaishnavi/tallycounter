@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F5F7">
+<title>Tally counter</title>
+<style>
+:root{
+  --paper:#F2F5F7;
+  --card:#FFFFFF;
+  --line:#DCE3E9;
+  --ink:#18212B;
+  --muted:#6C7A88;
+  --accent:#12594F;
+  --accent-ink:#FFFFFF;
+  --danger:#B23A34;
+  --shadow:0 1px 2px rgba(20,35,50,.07), 0 8px 24px rgba(20,35,50,.06);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#10151A; --card:#192027; --line:#2A333D; --ink:#E9EFF4; --muted:#93A2B0;
+    --accent:#6FCBB8; --accent-ink:#0C1B18; --danger:#E58279;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#10151A; --card:#192027; --line:#2A333D; --ink:#E9EFF4; --muted:#93A2B0;
+  --accent:#6FCBB8; --accent-ink:#0C1B18; --danger:#E58279;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px; line-height:1.45; -webkit-text-size-adjust:100%;
+  -webkit-tap-highlight-color:transparent; overscroll-behavior:none;
+}
+button,input{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+#app{height:100%;display:flex;flex-direction:column;max-width:760px;margin:0 auto;width:100%}
+.topbar{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
+.switch{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.switch button{padding:7px 16px;border-radius:999px;font-size:14.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+.switch button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.spacer{flex:1}
+.icon-btn{width:38px;height:38px;border-radius:999px;border:1px solid var(--line);background:var(--card);
+  display:grid;place-items:center;color:var(--muted)}
+.icon-btn{position:relative}
+.dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:99px;background:var(--muted);opacity:.45}
+.dot.on{background:var(--accent);opacity:1}
+.dot.busy{background:var(--accent);opacity:.55}
+.dot.err{background:var(--danger);opacity:1}
+.icon-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.screen{flex:1;min-height:0;display:none;flex-direction:column}
+.screen.active{display:flex}
+
+.labelrow{display:flex;justify-content:center;padding:2px 14px 0}
+.labelbtn{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:15px;font-weight:600;
+  padding:6px 12px;border-radius:999px}
+.labelbtn:hover{color:var(--ink)}
+.labelbtn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
+
+.tapzone{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;width:100%;padding:8px 14px;user-select:none;-webkit-user-select:none;touch-action:manipulation;border-radius:20px}
+.tapzone:active .count{transform:scale(.965)}
+.count{font-size:clamp(4.5rem,27vw,13rem);font-weight:700;line-height:.86;letter-spacing:-.035em;
+  font-variant-numeric:tabular-nums;transition:transform .09s ease-out}
+@media (prefers-reduced-motion: reduce){.count{transition:none}}
+.marks{display:flex;flex-wrap:wrap;gap:10px 14px;justify-content:center;align-items:center;
+  max-width:min(560px,92%);min-height:26px}
+.marks svg{height:24px;width:auto;overflow:visible}
+.marks path{stroke:var(--ink);stroke-width:2.1;stroke-linecap:round;fill:none;opacity:.78}
+.marks .more{color:var(--muted);font-size:13px;font-weight:600;align-self:center}
+
+.footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px 16px}
+.round{width:64px;height:64px;border-radius:999px;background:var(--card);border:1px solid var(--line);
+  box-shadow:var(--shadow);display:grid;place-items:center}
+.round svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.round:active{transform:translateY(1px)}
+.save{height:64px;padding:0 30px;border-radius:999px;background:var(--accent);color:var(--accent-ink);
+  font-weight:700;font-size:16.5px;box-shadow:var(--shadow)}
+.save:active{transform:translateY(1px)}
+
+.list{flex:1;min-height:0;overflow-y:auto;padding:4px 14px 8px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:12px 12px 12px 0;box-shadow:var(--shadow);overflow:hidden}
+.bar{width:7px;align-self:stretch;border-radius:0 6px 6px 0;flex:none}
+.meta{flex:1;min-width:0;text-align:left;padding:2px 0}
+.name{font-weight:650;font-size:16.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.name.blank{color:var(--muted);font-weight:600}
+.tag{display:inline-block;margin-top:3px;font-size:12.5px;color:var(--muted);font-weight:600}
+.stepper{display:flex;align-items:center;gap:4px;flex:none}
+.step{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink)}
+.step svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
+.step:active{transform:translateY(1px)}
+.val{min-width:58px;text-align:center;font-weight:750;font-size:22px;font-variant-numeric:tabular-nums;
+  padding:6px 8px;border-radius:11px}
+
+.empty{margin:auto;text-align:center;color:var(--muted);max-width:280px;padding:24px}
+.empty h2{font-size:19px;color:var(--ink);margin:0 0 6px}
+.empty p{margin:0 0 18px;font-size:14.5px}
+.ghost{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:13px 16px;
+  font-weight:650;font-size:15.5px;width:100%;text-align:center}
+
+.scrim{position:fixed;inset:0;background:rgba(10,18,26,.45);opacity:0;pointer-events:none;transition:opacity .18s;z-index:40}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);
+  border-radius:22px 22px 0 0;border-top:1px solid var(--line);
+  padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));
+  visibility:hidden;transform:translateY(110%);
+  transition:transform .22s cubic-bezier(.2,.8,.3,1), visibility 0s linear .22s;
+  max-height:88%;overflow-y:auto;max-width:760px;margin:0 auto}
+.sheet.open{visibility:visible;transform:translateY(0);
+  transition:transform .22s cubic-bezier(.2,.8,.3,1), visibility 0s linear 0s}
+@media (prefers-reduced-motion: reduce){.sheet{transition:none}}
+@media (min-width:720px){.sheet{border-radius:22px;bottom:24px;left:24px;right:24px;border:1px solid var(--line);
+  transform:translateY(calc(110% + 24px))}
+  .sheet.open{transform:translateY(0)}}
+.sheet h2{margin:0 0 14px;font-size:18.5px;font-weight:700}
+.field{display:block;margin-bottom:14px}
+.field span{display:block;font-size:13.5px;color:var(--muted);font-weight:600;margin-bottom:6px}
+.field input[type=text]{width:100%;padding:12px 14px;border-radius:13px;border:1px solid var(--line);
+  background:var(--paper);font-size:16px}
+.swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:8px}
+@media (max-width:420px){.swatches{grid-template-columns:repeat(6,1fr)}}
+.sw{aspect-ratio:1;border-radius:11px;border:2px solid transparent;position:relative}
+.sw[aria-pressed="true"]{border-color:var(--ink)}
+.sw[aria-pressed="true"]::after{content:"";position:absolute;inset:0;margin:auto;width:7px;height:7px;
+  border-radius:99px;background:rgba(15,25,35,.5)}
+.swlabel{font-size:12.5px;color:var(--muted);font-weight:650;margin:2px 0 7px}
+.customrow{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.customrow input[type=color]{width:42px;height:34px;padding:0;border:1px solid var(--line);border-radius:9px;background:none}
+.actions{display:flex;gap:10px;margin-top:6px}
+.actions button{flex:1;padding:14px;border-radius:14px;font-weight:700;font-size:15.5px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-quiet{background:var(--paper);border:1px solid var(--line)}
+.linkrow{margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.linkbtn{font-size:14.5px;font-weight:650;color:var(--muted)}
+.linkbtn.danger{color:var(--danger)}
+
+.log{display:flex;flex-direction:column;gap:9px}
+.logitem{display:flex;gap:12px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:9px}
+.logitem:last-child{border-bottom:0}
+.logmain{flex:1;min-width:0}
+.logname{font-weight:650;font-size:15.5px}
+.logsub{font-size:13px;color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+.logval{font-weight:750;font-variant-numeric:tabular-nums;font-size:17px}
+.logdel{color:var(--muted);font-size:13px;padding:4px}
+
+.toast{position:fixed;left:50%;transform:translate(-50%,20px);bottom:calc(88px + env(safe-area-inset-bottom,0px));
+  background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:999px;font-size:14.5px;font-weight:600;
+  opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:60;max-width:88%;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="switch" role="group" aria-label="Mode">
+      <button id="mTap" aria-pressed="true">Tap</button>
+      <button id="mMulti" aria-pressed="false">Counters</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="icon-btn" id="btnHistory" aria-label="Saved entries">
+      <svg viewBox="0 0 24 24"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+    </button>
+    <button class="icon-btn" id="btnSync" aria-label="Sync across devices">
+      <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-14-5M4 12a8 8 0 0 0 14 5"/><path d="M6 3v4H2M18 21v-4h4"/></svg>
+      <span class="dot" id="syncDot"></span>
+    </button>
+    <button class="icon-btn" id="btnData" aria-label="Backup and restore">
+      <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v3h16v-3"/></svg>
+    </button>
+  </div>
+
+  <section class="screen active" id="screenTap">
+    <div class="labelrow">
+      <button class="labelbtn" id="tapLabel">
+        <span id="tapLabelText">Add a name</span>
+        <svg viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16v4z"/></svg>
+      </button>
+    </div>
+    <button class="tapzone" id="tapzone" aria-label="Add one">
+      <div class="count" id="tapCount">0</div>
+      <div class="marks" id="tapMarks"></div>
+    </button>
+    <div class="footer">
+      <button class="round" id="tapMinus" aria-label="Subtract one">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>
+      </button>
+      <button class="save" id="tapSave">Save</button>
+    </div>
+  </section>
+
+  <section class="screen" id="screenMulti">
+    <div class="list" id="counterList"></div>
+    <div class="footer">
+      <button class="round" id="btnAdd" aria-label="New counter">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <button class="save" id="multiSave">Save</button>
+    </div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<div class="sheet" id="sheetCounter" role="dialog" aria-modal="true" aria-labelledby="sheetCounterTitle">
+  <h2 id="sheetCounterTitle">New counter</h2>
+  <label class="field"><span>Name</span><input type="text" id="cName" autocomplete="off"></label>
+  <label class="field"><span>Tag</span><input type="text" id="cTag" autocomplete="off"></label>
+  <div class="field">
+    <span>Colour</span>
+    <div class="swlabel">Pastels</div>
+    <div class="swatches" id="swPastel"></div>
+    <div class="swlabel">Deeper</div>
+    <div class="swatches" id="swDeep"></div>
+    <div class="customrow">
+      <input type="color" id="cCustom" aria-label="Custom colour">
+      <span style="font-size:13.5px;color:var(--muted)">or pick your own</span>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn-quiet" id="cCancel">Cancel</button>
+    <button class="btn-primary" id="cSave">Add counter</button>
+  </div>
+  <div class="linkrow" id="cEditExtras" hidden>
+    <button class="linkbtn" id="cReset">Reset to zero</button>
+    <button class="linkbtn danger" id="cDelete">Delete counter</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheetSave" role="dialog" aria-modal="true" aria-labelledby="sheetSaveTitle">
+  <h2 id="sheetSaveTitle">Save this count</h2>
+  <label class="field"><span>Entry name</span><input type="text" id="sName" autocomplete="off"></label>
+  <div id="sPreview" class="logsub" style="margin:-6px 0 14px"></div>
+  <div class="actions">
+    <button class="btn-quiet" id="sSaveKeep">Save</button>
+    <button class="btn-primary" id="sSaveReset">Save and reset</button>
+  </div>
+  <div class="linkrow"><button class="linkbtn" id="sCancel">Cancel</button><span></span></div>
+</div>
+
+<div class="sheet" id="sheetLabel" role="dialog" aria-modal="true" aria-labelledby="sheetLabelTitle">
+  <h2 id="sheetLabelTitle">Name this count</h2>
+  <label class="field"><span>Name</span><input type="text" id="lName" autocomplete="off"></label>
+  <div class="actions">
+    <button class="btn-quiet" id="lCancel">Cancel</button>
+    <button class="btn-primary" id="lSave">Done</button>
+  </div>
+  <div class="linkrow"><button class="linkbtn danger" id="lReset">Reset count to zero</button><span></span></div>
+</div>
+
+<div class="sheet" id="sheetHistory" role="dialog" aria-modal="true" aria-labelledby="sheetHistoryTitle">
+  <h2 id="sheetHistoryTitle">Saved entries</h2>
+  <div class="log" id="logList"></div>
+  <div class="linkrow"><button class="linkbtn" id="hClose">Close</button><span></span></div>
+</div>
+
+<div class="sheet" id="sheetData" role="dialog" aria-modal="true" aria-labelledby="sheetDataTitle">
+  <h2 id="sheetDataTitle">Backup and restore</h2>
+  <p class="logsub" style="margin:-8px 0 16px">Everything is stored in this browser. Export a file to move counts to your other device, then import it there.</p>
+  <div class="actions">
+    <button class="btn-quiet" id="dExport">Export file</button>
+    <button class="btn-primary" id="dImport">Import file</button>
+  </div>
+  <input type="file" id="dFile" accept="application/json,.json" hidden>
+  <div class="linkrow"><button class="linkbtn" id="dClose">Close</button><button class="linkbtn danger" id="dWipe">Erase everything</button></div>
+</div>
+
+<div class="sheet" id="sheetSync" role="dialog" aria-modal="true" aria-labelledby="sheetSyncTitle">
+  <h2 id="sheetSyncTitle">Sync across devices</h2>
+  <p class="logsub" id="syncStatus" style="margin:-8px 0 16px">Not connected.</p>
+  <label class="field"><span>Sync key</span><input type="text" id="syncKey" autocomplete="off" spellcheck="false"></label>
+  <p class="logsub" style="margin:-8px 0 16px">Enter the same key on every device of yours. Anyone without it uses the app normally, stored only in their own browser.</p>
+  <div class="actions">
+    <button class="btn-quiet" id="syncOff">Disconnect</button>
+    <button class="btn-primary" id="syncOn">Connect</button>
+  </div>
+  <div class="linkrow"><button class="linkbtn" id="syncClose">Close</button><button class="linkbtn" id="syncNow">Sync now</button></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+var PASTELS = ["#F6C7BD","#F7DDA6","#E5E5A8","#C6E5B4","#B4E1D8","#BCD7F2","#CEC8EF","#F2C5DE"];
+var DEEP    = ["#E4705C","#E09A2E","#9BAF45","#4FA06B","#2E9E93","#3F7FC8","#7C68C4","#C9538F"];
+var DEFAULT_COLOR = PASTELS[4];
+var KEY = "tallyCounter.v1";
+
+var state = { mode:"tap", tap:{ label:"", value:0 }, counters:[], log:[], updatedAt:0 };
+
+function load(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if (!raw) return;
+    var d = JSON.parse(raw);
+    if (d && typeof d === "object"){ adopt(d); state.updatedAt = Number(d.updatedAt) || 0; }
+  }catch(e){}
+  try{ var m = localStorage.getItem(KEY + ".mode"); if (m) state.mode = m; }catch(e){}
+}
+function adopt(d){
+  if (d.tap) state.tap = { label: String(d.tap.label || ""), value: Math.max(0, Number(d.tap.value) || 0) };
+  if (Array.isArray(d.counters)) state.counters = d.counters.map(function(c){
+    return { id: String(c.id || uid()), name: String(c.name || ""), tag: String(c.tag || ""),
+      color: /^#[0-9a-fA-F]{3,8}$/.test(c.color || "") ? c.color : DEFAULT_COLOR,
+      value: Math.max(0, Number(c.value) || 0), createdAt: c.createdAt || nowISO() };
+  });
+  if (Array.isArray(d.log)) state.log = d.log.map(function(e){
+    return { id: String(e.id || uid()), name: String(e.name || ""), kind: e.kind === "counters" ? "counters" : "tap",
+      total: Number(e.total) || 0, detail: String(e.detail || ""), at: e.at || nowISO() };
+  });
+}
+var saveTimer;
+function persist(fromRemote){
+  if (!fromRemote){ state.updatedAt = Date.now(); schedulePush(); }
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){
+    try{
+      localStorage.setItem(KEY, JSON.stringify({ tap:state.tap, counters:state.counters,
+        log:state.log, updatedAt: state.updatedAt }));
+    }catch(e){ toast("Could not save. Browser storage is blocked or full."); }
+  }, 250);
+}
+
+var $ = function(id){ return document.getElementById(id); };
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function nowISO(){ return new Date().toISOString(); }
+function fmtWhen(iso){
+  var d = new Date(iso);
+  if (isNaN(d)) return "";
+  return d.toLocaleString(undefined, {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
+}
+var toastTimer;
+function toast(msg){
+  var t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2400);
+}
+function tick(){ if (navigator.vibrate){ try{ navigator.vibrate(8); }catch(e){} } }
+
+/* ---------- tally marks ---------- */
+function markGroup(n){
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.createElementNS(NS,"svg");
+  var w = n === 5 ? 22 : (n - 1) * 5 + 4;
+  svg.setAttribute("viewBox","0 0 " + w + " 22");
+  svg.setAttribute("aria-hidden","true");
+  var upright = Math.min(n, 4), d = "";
+  for (var i = 0; i < upright; i++){ d += "M" + (2 + i * 5) + " 2 V20 "; }
+  var p = document.createElementNS(NS,"path"); p.setAttribute("d", d.trim()); svg.appendChild(p);
+  if (n === 5){ var s = document.createElementNS(NS,"path"); s.setAttribute("d","M0 19 L20 3"); svg.appendChild(s); }
+  return svg;
+}
+function renderMarks(container, value){
+  container.textContent = "";
+  var groups = Math.floor(value / 5), rem = value % 5, MAXG = 11, hidden = 0;
+  if (groups > MAXG){ hidden = groups - MAXG; groups = MAXG; }
+  if (hidden > 0){ var s = document.createElement("span"); s.className = "more"; s.textContent = "+" + (hidden * 5); container.appendChild(s); }
+  for (var i = 0; i < groups; i++) container.appendChild(markGroup(5));
+  if (rem > 0) container.appendChild(markGroup(rem));
+}
+
+/* ---------- render ---------- */
+function renderTap(){
+  $("tapCount").textContent = state.tap.value;
+  $("tapLabelText").textContent = state.tap.label || "Add a name";
+  renderMarks($("tapMarks"), state.tap.value);
+}
+function tint(hex, alpha){
+  var h = hex.replace("#","");
+  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  var r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+  return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+}
+function renderCounters(){
+  var list = $("counterList"); list.textContent = "";
+  if (!state.counters.length){
+    var e = document.createElement("div"); e.className = "empty";
+    var h = document.createElement("h2"); h.textContent = "No counters yet";
+    var p = document.createElement("p"); p.textContent = "Make one for each thing you want to track \u2014 name it, tag it, give it a colour.";
+    var b = document.createElement("button"); b.className = "ghost"; b.textContent = "New counter";
+    b.addEventListener("click", function(){ openCounterSheet(null); });
+    e.appendChild(h); e.appendChild(p); e.appendChild(b); list.appendChild(e); return;
+  }
+  state.counters.forEach(function(c){
+    var row = document.createElement("div"); row.className = "row";
+    var bar = document.createElement("div"); bar.className = "bar"; bar.style.background = c.color; row.appendChild(bar);
+
+    var meta = document.createElement("button"); meta.className = "meta";
+    meta.setAttribute("aria-label", "Edit counter");
+    var nm = document.createElement("div"); nm.className = "name" + (c.name ? "" : " blank");
+    nm.textContent = c.name || "Untitled";
+    meta.appendChild(nm);
+    if (c.tag){ var tg = document.createElement("span"); tg.className = "tag"; tg.textContent = c.tag; meta.appendChild(tg); }
+    meta.addEventListener("click", function(){ openCounterSheet(c.id); });
+    row.appendChild(meta);
+
+    var st = document.createElement("div"); st.className = "stepper";
+    var minus = document.createElement("button"); minus.className = "step"; minus.setAttribute("aria-label","Subtract one");
+    minus.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>';
+    minus.addEventListener("click", function(){ bump(c.id, -1); });
+    var val = document.createElement("div"); val.className = "val"; val.id = "val-" + c.id;
+    val.textContent = c.value; val.style.background = tint(c.color, .34);
+    var plus = document.createElement("button"); plus.className = "step"; plus.setAttribute("aria-label","Add one");
+    plus.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
+    plus.addEventListener("click", function(){ bump(c.id, 1); });
+    st.appendChild(minus); st.appendChild(val); st.appendChild(plus);
+    row.appendChild(st); list.appendChild(row);
+  });
+}
+function renderLog(){
+  var wrap = $("logList"); wrap.textContent = "";
+  if (!state.log.length){
+    var p = document.createElement("div"); p.className = "logsub";
+    p.textContent = "Nothing saved yet. Hit Save on either screen to keep a count here.";
+    wrap.appendChild(p); return;
+  }
+  state.log.forEach(function(e){
+    var item = document.createElement("div"); item.className = "logitem";
+    var main = document.createElement("div"); main.className = "logmain";
+    var n = document.createElement("div"); n.className = "logname"; n.textContent = e.name || "Untitled";
+    var s = document.createElement("div"); s.className = "logsub";
+    s.textContent = fmtWhen(e.at) + (e.detail ? " \u00b7 " + e.detail : "");
+    main.appendChild(n); main.appendChild(s);
+    var v = document.createElement("div"); v.className = "logval"; v.textContent = e.total;
+    var del = document.createElement("button"); del.className = "logdel"; del.textContent = "Delete";
+    del.setAttribute("aria-label","Delete entry");
+    del.addEventListener("click", function(){
+      state.log = state.log.filter(function(x){ return x.id !== e.id; });
+      persist(); renderLog();
+    });
+    item.appendChild(main); item.appendChild(v); item.appendChild(del); wrap.appendChild(item);
+  });
+}
+
+/* ---------- actions ---------- */
+function setMode(m){
+  state.mode = m;
+  try{ localStorage.setItem(KEY + ".mode", m); }catch(e){}
+  $("mTap").setAttribute("aria-pressed", m === "tap" ? "true" : "false");
+  $("mMulti").setAttribute("aria-pressed", m === "multi" ? "true" : "false");
+  $("screenTap").classList.toggle("active", m === "tap");
+  $("screenMulti").classList.toggle("active", m === "multi");
+}
+function tapBump(delta){
+  var next = state.tap.value + delta;
+  if (next < 0) return;
+  state.tap.value = next; renderTap(); tick(); persist();
+}
+function bump(id, delta){
+  var c = state.counters.filter(function(x){ return x.id === id; })[0];
+  if (!c) return;
+  var next = c.value + delta;
+  if (next < 0) return;
+  c.value = next;
+  var el = $("val-" + id); if (el) el.textContent = c.value;
+  tick(); persist();
+}
+
+var openSheetEl = null;
+function openSheet(el){
+  if (openSheetEl) openSheetEl.classList.remove("open");
+  openSheetEl = el; el.classList.add("open"); $("scrim").classList.add("open");
+}
+function closeSheet(){
+  if (openSheetEl) openSheetEl.classList.remove("open");
+  openSheetEl = null; $("scrim").classList.remove("open");
+}
+$("scrim").addEventListener("click", closeSheet);
+document.addEventListener("keydown", function(e){ if (e.key === "Escape" && openSheetEl) closeSheet(); });
+
+var editingId = null, pickedColor = DEFAULT_COLOR;
+function buildSwatches(){
+  function fill(host, colors){
+    host.textContent = "";
+    colors.forEach(function(col){
+      var b = document.createElement("button");
+      b.className = "sw"; b.style.background = col; b.dataset.color = col;
+      b.setAttribute("aria-label","Colour " + col); b.setAttribute("aria-pressed","false");
+      b.addEventListener("click", function(){ pickedColor = col; syncSwatches(); });
+      host.appendChild(b);
+    });
+  }
+  fill($("swPastel"), PASTELS); fill($("swDeep"), DEEP);
+}
+function syncSwatches(){
+  Array.prototype.forEach.call(document.querySelectorAll(".sw"), function(b){
+    b.setAttribute("aria-pressed", b.dataset.color.toLowerCase() === String(pickedColor).toLowerCase() ? "true" : "false");
+  });
+  $("cCustom").value = pickedColor;
+}
+function openCounterSheet(id){
+  editingId = id;
+  var c = id ? state.counters.filter(function(x){ return x.id === id; })[0] : null;
+  $("sheetCounterTitle").textContent = c ? "Edit counter" : "New counter";
+  $("cSave").textContent = c ? "Save changes" : "Add counter";
+  $("cName").value = c ? c.name : "";
+  $("cTag").value = c ? c.tag : "";
+  pickedColor = c ? c.color : PASTELS[Math.floor(Math.random() * PASTELS.length)];
+  syncSwatches();
+  $("cEditExtras").hidden = !c;
+  openSheet($("sheetCounter"));
+  setTimeout(function(){ $("cName").focus(); }, 180);
+}
+$("cCustom").addEventListener("input", function(e){ pickedColor = e.target.value; syncSwatches(); });
+$("cCancel").addEventListener("click", closeSheet);
+$("cSave").addEventListener("click", function(){
+  var name = $("cName").value.trim(), tag = $("cTag").value.trim();
+  if (editingId){
+    var c = state.counters.filter(function(x){ return x.id === editingId; })[0];
+    if (c){ c.name = name; c.tag = tag; c.color = pickedColor; }
+  } else {
+    state.counters.push({ id: uid(), name: name, tag: tag, color: pickedColor, value: 0, createdAt: nowISO() });
+  }
+  persist(); renderCounters(); closeSheet();
+});
+$("cReset").addEventListener("click", function(){
+  var c = state.counters.filter(function(x){ return x.id === editingId; })[0];
+  if (c) c.value = 0;
+  persist(); renderCounters(); closeSheet(); toast("Counter reset to zero");
+});
+$("cDelete").addEventListener("click", function(){
+  state.counters = state.counters.filter(function(x){ return x.id !== editingId; });
+  persist(); renderCounters(); closeSheet(); toast("Counter deleted");
+});
+
+var savingKind = "tap";
+function openSaveSheet(kind){
+  savingKind = kind;
+  $("sName").value = "";
+  if (kind === "tap"){
+    $("sheetSaveTitle").textContent = "Save this count";
+    $("sPreview").textContent = "Total " + state.tap.value;
+    $("sSaveReset").textContent = "Save and reset";
+  } else {
+    if (!state.counters.length){ toast("Add a counter first"); return; }
+    $("sheetSaveTitle").textContent = "Save all counters";
+    $("sPreview").textContent = state.counters.map(function(c){ return (c.name || "Untitled") + " " + c.value; }).join(" \u00b7 ");
+    $("sSaveReset").textContent = "Save and reset all";
+  }
+  openSheet($("sheetSave"));
+  setTimeout(function(){ $("sName").focus(); }, 180);
+}
+function commitSave(reset){
+  var name = $("sName").value.trim(), entry;
+  if (savingKind === "tap"){
+    entry = { id: uid(), name: name, kind:"tap", total: state.tap.value, detail:"", at: nowISO() };
+  } else {
+    var total = state.counters.reduce(function(s,c){ return s + c.value; }, 0);
+    entry = { id: uid(), name: name, kind:"counters", total: total,
+      detail: state.counters.map(function(c){ return (c.name || "Untitled") + " " + c.value; }).join(", "), at: nowISO() };
+  }
+  state.log.unshift(entry);
+  if (state.log.length > 500) state.log = state.log.slice(0, 500);
+  if (reset){
+    if (savingKind === "tap"){ state.tap.value = 0; renderTap(); }
+    else { state.counters.forEach(function(c){ c.value = 0; }); renderCounters(); }
+  }
+  persist(); renderLog(); closeSheet();
+  toast(reset ? "Saved and reset" : "Saved");
+}
+$("sSaveKeep").addEventListener("click", function(){ commitSave(false); });
+$("sSaveReset").addEventListener("click", function(){ commitSave(true); });
+$("sCancel").addEventListener("click", closeSheet);
+
+$("tapLabel").addEventListener("click", function(){
+  $("lName").value = state.tap.label || "";
+  openSheet($("sheetLabel"));
+  setTimeout(function(){ $("lName").focus(); $("lName").select(); }, 180);
+});
+$("lSave").addEventListener("click", function(){
+  state.tap.label = $("lName").value.trim();
+  renderTap(); persist(); closeSheet();
+});
+$("lCancel").addEventListener("click", closeSheet);
+$("lReset").addEventListener("click", function(){
+  state.tap.value = 0; renderTap(); persist(); closeSheet(); toast("Count reset to zero");
+});
+
+$("btnHistory").addEventListener("click", function(){ renderLog(); openSheet($("sheetHistory")); });
+$("hClose").addEventListener("click", closeSheet);
+
+/* ---------- backup ---------- */
+$("btnData").addEventListener("click", function(){ openSheet($("sheetData")); });
+$("dClose").addEventListener("click", closeSheet);
+$("dExport").addEventListener("click", function(){
+  var blob = new Blob([JSON.stringify({ version:1, exportedAt: nowISO(),
+    tap: state.tap, counters: state.counters, log: state.log }, null, 2)], {type:"application/json"});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "tally-" + new Date().toISOString().slice(0,10) + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  toast("Exported");
+});
+$("dImport").addEventListener("click", function(){ $("dFile").click(); });
+$("dFile").addEventListener("change", function(e){
+  var f = e.target.files && e.target.files[0];
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function(){
+    try{
+      var d = JSON.parse(r.result);
+      adopt(d); persist(); renderTap(); renderCounters(); renderLog(); closeSheet();
+      toast("Imported");
+    }catch(err){ toast("That file could not be read."); }
+  };
+  r.onerror = function(){ toast("That file could not be read."); };
+  r.readAsText(f);
+  e.target.value = "";
+});
+$("dWipe").addEventListener("click", function(){
+  if (!window.confirm("Erase all counters and saved entries on this device?")) return;
+  state.tap = { label:"", value:0 }; state.counters = []; state.log = [];
+  persist();
+  renderTap(); renderCounters(); renderLog(); closeSheet(); toast("Erased");
+});
+
+/* ---------- sync ---------- */
+var SKEY = KEY + ".synckey";
+var sync = { key:"", lastPull:0 };
+try{ sync.key = localStorage.getItem(SKEY) || ""; }catch(e){}
+
+function setSyncUI(cls, msg){
+  var d = $("syncDot");
+  d.className = "dot" + (cls ? " " + cls : "");
+  $("syncStatus").textContent = msg;
+}
+function schedulePush(){
+  if (!sync.key) return;
+  clearTimeout(sync.timer);
+  sync.timer = setTimeout(function(){ push(); }, 1500);
+}
+function pull(quiet){
+  if (!sync.key) return Promise.resolve();
+  setSyncUI("busy", "Checking\u2026");
+  return fetch("/api/state", { headers:{ "x-sync-key": sync.key }, cache:"no-store" })
+    .then(function(r){
+      if (r.status === 401){ setSyncUI("err", "That key was rejected."); return null; }
+      if (!r.ok) throw new Error("http " + r.status);
+      return r.json();
+    })
+    .then(function(j){
+      if (!j) return;
+      var remoteAt = Number(j.updatedAt) || 0;
+      if (j.data && remoteAt > (state.updatedAt || 0)){
+        adopt(j.data);
+        state.updatedAt = remoteAt;
+        persist(true);
+        renderTap(); renderCounters(); renderLog();
+        setSyncUI("on", "Up to date \u2014 pulled from your other device.");
+        if (!quiet) toast("Pulled the newer version");
+      } else if (remoteAt < (state.updatedAt || 0)){
+        return push(quiet);
+      } else {
+        setSyncUI("on", "Up to date.");
+      }
+    })
+    .catch(function(){ setSyncUI("err", "Could not reach the server. Changes stay on this device."); });
+}
+function push(quiet){
+  if (!sync.key) return Promise.resolve();
+  setSyncUI("busy", "Saving\u2026");
+  return fetch("/api/state", {
+    method:"PUT",
+    headers:{ "content-type":"application/json", "x-sync-key": sync.key },
+    body: JSON.stringify({ updatedAt: state.updatedAt || Date.now(),
+      data:{ tap:state.tap, counters:state.counters, log:state.log } })
+  }).then(function(r){
+    if (r.status === 401){ setSyncUI("err", "That key was rejected."); return; }
+    if (!r.ok) throw new Error("http " + r.status);
+    setSyncUI("on", "Up to date.");
+    if (!quiet) toast("Synced");
+  }).catch(function(){ setSyncUI("err", "Offline. It will sync next time you open the app."); });
+}
+$("btnSync").addEventListener("click", function(){
+  $("syncKey").value = sync.key;
+  if (!sync.key) setSyncUI("", "Not connected. Counts stay in this browser.");
+  openSheet($("sheetSync"));
+});
+$("syncOn").addEventListener("click", function(){
+  var k = $("syncKey").value.trim();
+  if (!k){ setSyncUI("err", "Enter your key first."); return; }
+  sync.key = k;
+  try{ localStorage.setItem(SKEY, k); }catch(e){}
+  pull();
+});
+$("syncOff").addEventListener("click", function(){
+  sync.key = "";
+  try{ localStorage.removeItem(SKEY); }catch(e){}
+  $("syncKey").value = "";
+  setSyncUI("", "Disconnected. Counts stay in this browser.");
+});
+$("syncNow").addEventListener("click", function(){ sync.lastPull = Date.now(); pull(); });
+$("syncClose").addEventListener("click", closeSheet);
+
+function refreshFromServer(){
+  if (!sync.key || document.hidden) return;
+  if (Date.now() - sync.lastPull < 5000) return;
+  sync.lastPull = Date.now();
+  pull(true);
+}
+window.addEventListener("focus", refreshFromServer);
+document.addEventListener("visibilitychange", refreshFromServer);
+
+/* ---------- wiring ---------- */
+$("mTap").addEventListener("click", function(){ setMode("tap"); });
+$("mMulti").addEventListener("click", function(){ setMode("multi"); });
+$("btnAdd").addEventListener("click", function(){ openCounterSheet(null); });
+$("multiSave").addEventListener("click", function(){ openSaveSheet("counters"); });
+$("tapSave").addEventListener("click", function(){ openSaveSheet("tap"); });
+$("tapMinus").addEventListener("click", function(){ tapBump(-1); });
+
+var tz = $("tapzone");
+tz.addEventListener("pointerdown", function(e){
+  if (e.button != null && e.button !== 0) return;
+  e.preventDefault(); tapBump(1);
+});
+tz.addEventListener("keydown", function(e){
+  if (e.key === " " || e.key === "Enter"){ e.preventDefault(); tapBump(1); }
+});
+tz.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+
+document.addEventListener("keydown", function(e){
+  if (openSheetEl || state.mode !== "tap") return;
+  var t = e.target;
+  if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+  if (e.key === "ArrowUp"){ e.preventDefault(); tapBump(1); }
+  if (e.key === "ArrowDown" || e.key === "Backspace"){ e.preventDefault(); tapBump(-1); }
+});
+
+window.addEventListener("storage", function(e){
+  if (e.key !== KEY || !e.newValue) return;
+  try{ adopt(JSON.parse(e.newValue)); renderTap(); renderCounters(); renderLog(); }catch(err){}
+});
+
+load();
+buildSwatches();
+setMode(state.mode);
+renderTap();
+renderCounters();
+renderLog();
+if (sync.key){ sync.lastPull = Date.now(); pull(true); }
+else setSyncUI("", "Not connected. Counts stay in this browser.");
+})();
+</script>
+</body>
+</html>

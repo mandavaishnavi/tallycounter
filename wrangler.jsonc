@@ -1,0 +1,22 @@
+{
+  // Must match your existing Worker's name, or the deploy creates a second Worker.
+  "name": "tally",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-09-01",
+
+  // Everything in public/ is served as a static file.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+
+  // Declared here as well as in the dashboard — a wrangler deploy replaces
+  // dashboard bindings with whatever this file says. Secrets are not affected.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tally",
+      "database_id": "PASTE_YOUR_DATABASE_ID"
+    }
+  ]
+}
