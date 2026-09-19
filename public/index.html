@@ -91,15 +91,16 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .save:active{transform:translateY(1px)}
 
 .list{flex:1;min-height:0;overflow-y:auto;padding:4px 14px 8px;display:flex;flex-direction:column;gap:10px}
-.row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
-  border-radius:16px;padding:12px 12px 12px 0;box-shadow:var(--shadow);overflow:hidden}
-.bar{width:7px;align-self:stretch;border-radius:0 6px 6px 0;flex:none}
+.row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid rgba(0,0,0,.10);
+  border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);overflow:hidden}
 .meta{flex:1;min-width:0;text-align:left;padding:2px 0}
 .name{font-weight:650;font-size:16.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.name.blank{color:var(--muted);font-weight:600}
-.tag{display:inline-block;margin-top:3px;font-size:12.5px;color:var(--muted);font-weight:600}
+.name.blank{opacity:.6;font-weight:600}
+.tag{display:inline-block;margin-top:3px;font-size:12.5px;color:currentColor;opacity:.72;font-weight:600}
 .stepper{display:flex;align-items:center;gap:4px;flex:none}
-.step{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink)}
+.step{width:42px;height:42px;border-radius:12px;border:1px solid currentColor;opacity:.75;
+  display:grid;place-items:center;color:inherit;background:none}
+.step:hover{opacity:1}
 .step svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
 .step:active{transform:translateY(1px)}
 .val{min-width:58px;text-align:center;font-weight:750;font-size:22px;font-variant-numeric:tabular-nums;
@@ -384,6 +385,18 @@ function tint(hex, alpha){
   var r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
   return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
 }
+function rgbOf(hex){
+  var h = String(hex).replace("#","");
+  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+}
+// Perceived brightness, so dark text sits on pastels and white text on deep colours.
+function inkOn(hex){
+  var c = rgbOf(hex);
+  var lin = c.map(function(v){ v /= 255; return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); });
+  var L = 0.2126*lin[0] + 0.7152*lin[1] + 0.0722*lin[2];
+  return L > 0.42 ? "#18212B" : "#FFFFFF";
+}
 function renderCounters(){
   var list = $("counterList"); list.textContent = "";
   if (!state.counters.length){
@@ -396,7 +409,8 @@ function renderCounters(){
   }
   state.counters.forEach(function(c){
     var row = document.createElement("div"); row.className = "row";
-    var bar = document.createElement("div"); bar.className = "bar"; bar.style.background = c.color; row.appendChild(bar);
+    row.style.background = c.color;
+    row.style.color = inkOn(c.color);
 
     var meta = document.createElement("button"); meta.className = "meta";
     meta.setAttribute("aria-label", "Edit counter");
@@ -412,7 +426,8 @@ function renderCounters(){
     minus.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>';
     minus.addEventListener("click", function(){ bump(c.id, -1); });
     var val = document.createElement("div"); val.className = "val"; val.id = "val-" + c.id;
-    val.textContent = c.value; val.style.background = tint(c.color, .34);
+    val.textContent = c.value;
+    val.style.background = inkOn(c.color) === "#FFFFFF" ? "rgba(255,255,255,.20)" : "rgba(255,255,255,.55)";
     var plus = document.createElement("button"); plus.className = "step"; plus.setAttribute("aria-label","Add one");
     plus.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
     plus.addEventListener("click", function(){ bump(c.id, 1); });
