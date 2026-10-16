@@ -159,6 +159,36 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .logval{font-weight:750;font-variant-numeric:tabular-nums;font-size:17px}
 .logdel{color:var(--muted);font-size:13px;padding:4px}
 
+@media (max-width:420px){
+  .topbar{gap:6px}
+  .switch button{padding:7px 11px}
+}
+
+.cal{flex:1;min-height:0;overflow-y:auto;padding:6px 14px 24px;display:flex;flex-direction:column;gap:16px;align-items:center}
+.cal>*{width:100%;max-width:460px;flex:none}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:28px;font-weight:750;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:2px;font-size:12.5px;color:var(--muted);font-weight:650}
+.monthnav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.monthtitle{font-weight:700;font-size:17px;padding:6px 12px;border-radius:999px}
+.wk,.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.wk span{text-align:center;font-size:12px;color:var(--muted);font-weight:650}
+.day{aspect-ratio:1;min-width:0;border-radius:12px;border:1px solid var(--line);background:var(--card);
+  font-weight:650;font-size:14.5px;font-variant-numeric:tabular-nums;display:grid;place-items:center;touch-action:manipulation}
+.day.blank{visibility:hidden;border:0}
+.day.today{outline:2px solid var(--accent);outline-offset:1px}
+.day.painted{border-color:rgba(0,0,0,.10)}
+.brushlabel{font-size:12.5px;color:var(--muted);font-weight:650;margin-bottom:7px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:7px;max-width:200px;padding:8px 14px;border-radius:999px;
+  border:1px solid var(--line);background:var(--card);font-size:14.5px;font-weight:650;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip i{flex:none;width:10px;height:10px;border-radius:99px;border:1px solid rgba(0,0,0,.25)}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.calhint{font-size:13px;color:var(--muted);margin:8px 0 0}
+
 .toast{position:fixed;left:50%;transform:translate(-50%,20px);bottom:calc(88px + env(safe-area-inset-bottom,0px));
   background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:999px;font-size:14.5px;font-weight:600;
   opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:60;max-width:88%;text-align:center}
@@ -171,6 +201,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
     <div class="switch" role="group" aria-label="Mode">
       <button id="mTap" aria-pressed="true">Tap</button>
       <button id="mMulti" aria-pressed="false">Counters</button>
+      <button id="mCal" aria-pressed="false">Days</button>
     </div>
     <div class="spacer"></div>
     <button class="icon-btn" id="btnHistory" aria-label="Saved entries">
@@ -212,6 +243,40 @@ button{background:none;border:0;padding:0;cursor:pointer}
         <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
       </button>
       <button class="save" id="multiSave">Save</button>
+    </div>
+  </section>
+
+  <section class="screen" id="screenCal">
+    <div class="cal">
+      <div class="chips" id="calTasks" role="group" aria-label="Task"></div>
+      <div class="stats">
+        <div class="stat"><b id="stCur">0</b><span>Current streak</span></div>
+        <div class="stat"><b id="stMax">0</b><span>Max streak</span></div>
+        <div class="stat"><b id="stTotal">0</b><span>Total days</span></div>
+      </div>
+      <div class="monthnav">
+        <button class="icon-btn" id="calPrev" aria-label="Previous month">
+          <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <button class="monthtitle" id="calTitle" aria-label="Jump to this month"></button>
+        <button class="icon-btn" id="calNext" aria-label="Next month">
+          <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <div>
+        <div class="wk" id="calWeek"></div>
+        <div class="grid" id="calGrid" style="margin-top:6px"></div>
+      </div>
+      <div>
+        <div class="brushlabel">Colour to paint with</div>
+        <div class="swatches" id="brushPastel"></div>
+        <div class="swatches" id="brushDeep"></div>
+        <div class="customrow">
+          <input type="color" id="brushCustom" aria-label="Custom colour">
+          <span style="font-size:13.5px;color:var(--muted)">or pick your own</span>
+        </div>
+        <p class="calhint">Pick a task above, then tap a day to paint it. Tap a painted day with the same colour to clear it.</p>
+      </div>
     </div>
   </section>
 </div>
@@ -304,7 +369,7 @@ var DEEP    = ["#E4705C","#E09A2E","#9BAF45","#4FA06B","#2E9E93","#3F7FC8","#7C6
 var DEFAULT_COLOR = PASTELS[4];
 var KEY = "tallyCounter.v1";
 
-var state = { mode:"tap", tap:{ label:"", value:0 }, counters:[], log:[], updatedAt:0 };
+var state = { mode:"tap", tap:{ label:"", value:0, days:{} }, counters:[], log:[], updatedAt:0 };
 
 function load(){
   try{
@@ -315,12 +380,22 @@ function load(){
   }catch(e){}
   try{ var m = localStorage.getItem(KEY + ".mode"); if (m) state.mode = m; }catch(e){}
 }
+function cleanDays(src){
+  var out = {};
+  if (src && typeof src === "object" && !Array.isArray(src)){
+    Object.keys(src).forEach(function(k){
+      if (/^\d{4}-\d{2}-\d{2}$/.test(k) && /^#[0-9a-fA-F]{3,8}$/.test(src[k] || "")) out[k] = src[k];
+    });
+  }
+  return out;
+}
 function adopt(d){
-  if (d.tap) state.tap = { label: String(d.tap.label || ""), value: Math.max(0, Number(d.tap.value) || 0) };
+  if (d.tap) state.tap = { label: String(d.tap.label || ""), value: Math.max(0, Number(d.tap.value) || 0),
+    days: cleanDays(d.tap.days || d.days) };
   if (Array.isArray(d.counters)) state.counters = d.counters.map(function(c){
     return { id: String(c.id || uid()), name: String(c.name || ""), tag: String(c.tag || ""),
       color: /^#[0-9a-fA-F]{3,8}$/.test(c.color || "") ? c.color : DEFAULT_COLOR,
-      value: Math.max(0, Number(c.value) || 0), createdAt: c.createdAt || nowISO() };
+      value: Math.max(0, Number(c.value) || 0), createdAt: c.createdAt || nowISO(), days: cleanDays(c.days) };
   });
   if (Array.isArray(d.log)) state.log = d.log.map(function(e){
     return { id: String(e.id || uid()), name: String(e.name || ""), kind: e.kind === "counters" ? "counters" : "tap",
@@ -475,8 +550,11 @@ function setMode(m){
   try{ localStorage.setItem(KEY + ".mode", m); }catch(e){}
   $("mTap").setAttribute("aria-pressed", m === "tap" ? "true" : "false");
   $("mMulti").setAttribute("aria-pressed", m === "multi" ? "true" : "false");
+  $("mCal").setAttribute("aria-pressed", m === "cal" ? "true" : "false");
   $("screenTap").classList.toggle("active", m === "tap");
   $("screenMulti").classList.toggle("active", m === "multi");
+  $("screenCal").classList.toggle("active", m === "cal");
+  if (m === "cal") renderCalendar();
 }
 function tapBump(delta){
   var next = state.tap.value + delta;
@@ -545,7 +623,7 @@ $("cSave").addEventListener("click", function(){
     var c = state.counters.filter(function(x){ return x.id === editingId; })[0];
     if (c){ c.name = name; c.tag = tag; c.color = pickedColor; }
   } else {
-    state.counters.push({ id: uid(), name: name, tag: tag, color: pickedColor, value: 0, createdAt: nowISO() });
+    state.counters.push({ id: uid(), name: name, tag: tag, color: pickedColor, value: 0, createdAt: nowISO(), days: {} });
   }
   persist(); renderCounters(); closeSheet();
 });
@@ -611,7 +689,7 @@ $("tapReset").addEventListener("click", function(){
     return;
   }
   disarmReset();
-  state.tap.value = 0; renderTap(); touch(); toast("Count reset to zero");
+  state.tap.value = 0; renderTap(); persist(); toast("Count reset to zero");
 });
 
 $("tapLabel").addEventListener("click", function(){
@@ -652,7 +730,7 @@ $("dFile").addEventListener("change", function(e){
   r.onload = function(){
     try{
       var d = JSON.parse(r.result);
-      adopt(d); persist(); renderTap(); renderCounters(); renderLog(); closeSheet();
+      adopt(d); persist(); renderTap(); renderCounters(); renderLog(); renderCalendar(); closeSheet();
       toast("Imported");
     }catch(err){ toast("That file could not be read."); }
   };
@@ -662,9 +740,9 @@ $("dFile").addEventListener("change", function(e){
 });
 $("dWipe").addEventListener("click", function(){
   if (!window.confirm("Erase all counters and saved entries on this device?")) return;
-  state.tap = { label:"", value:0 }; state.counters = []; state.log = [];
+  state.tap = { label:"", value:0, days:{} }; state.counters = []; state.log = [];
   persist();
-  renderTap(); renderCounters(); renderLog(); closeSheet(); toast("Erased");
+  renderTap(); renderCounters(); renderLog(); renderCalendar(); closeSheet(); toast("Erased");
 });
 
 /* ---------- sync ---------- */
@@ -698,7 +776,7 @@ function pull(quiet){
         adopt(j.data);
         state.updatedAt = remoteAt;
         persist(true);
-        renderTap(); renderCounters(); renderLog();
+        renderTap(); renderCounters(); renderLog(); renderCalendar();
         setSyncUI("on", "Up to date \u2014 pulled from your other device.");
         if (!quiet) toast("Pulled the newer version");
       } else if (remoteAt < (state.updatedAt || 0)){
@@ -754,9 +832,149 @@ function refreshFromServer(){
 window.addEventListener("focus", refreshFromServer);
 document.addEventListener("visibilitychange", refreshFromServer);
 
+/* ---------- calendar ---------- */
+var BRUSH_KEY = KEY + ".brush";
+var brush = DEEP[4];
+try{ var bsaved = localStorage.getItem(BRUSH_KEY); if (/^#[0-9a-fA-F]{6}$/.test(bsaved || "")) brush = bsaved; }catch(e){}
+var CALSEL_KEY = KEY + ".calsel";
+var calSel = "tap";
+try{ calSel = localStorage.getItem(CALSEL_KEY) || "tap"; }catch(e){}
+function selectedTask(){
+  if (calSel !== "tap"){
+    var c = state.counters.filter(function(x){ return x.id === calSel; })[0];
+    if (c) return c;
+  }
+  calSel = "tap";
+  return state.tap;
+}
+function taskDays(){
+  var t = selectedTask();
+  if (!t.days) t.days = {};
+  return t.days;
+}
+var calView = (function(){ var n = new Date(); return { y:n.getFullYear(), m:n.getMonth() }; })();
+var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+var WEEKDAYS = ["S","M","T","W","T","F","S"];
+
+function pad2(n){ return (n < 10 ? "0" : "") + n; }
+function dayKey(y, m, d){ return y + "-" + pad2(m + 1) + "-" + pad2(d); }
+function todayKey(){ var n = new Date(); return dayKey(n.getFullYear(), n.getMonth(), n.getDate()); }
+function dayNum(key){ var p = key.split("-"); return Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000); }
+
+// Current streak counts back from today. If today is not painted yet, it counts back
+// from yesterday, so the streak does not read zero until the day is actually missed.
+function streakStats(){
+  var nums = Object.keys(taskDays()).map(dayNum).sort(function(a, b){ return a - b; });
+  var have = {}, best = 0, run = 0, prev = null;
+  nums.forEach(function(n){
+    have[n] = true;
+    run = (prev !== null && n === prev + 1) ? run + 1 : 1;
+    if (run > best) best = run;
+    prev = n;
+  });
+  var t = dayNum(todayKey()), cur = 0, c = have[t] ? t : t - 1;
+  while (have[c]){ cur++; c--; }
+  return { cur: cur, best: best, total: nums.length };
+}
+
+function renderTasks(){
+  var host = $("calTasks"); host.textContent = "";
+  selectedTask();
+  function chip(id, label, color){
+    var b = document.createElement("button");
+    b.className = "chip"; b.setAttribute("aria-pressed", id === calSel ? "true" : "false");
+    if (color){ var dot = document.createElement("i"); dot.style.background = color; b.appendChild(dot); }
+    var sp = document.createElement("span"); sp.textContent = label; b.appendChild(sp);
+    b.addEventListener("click", function(){
+      calSel = id;
+      try{ localStorage.setItem(CALSEL_KEY, id); }catch(e){}
+      if (id !== "tap"){ var c = state.counters.filter(function(x){ return x.id === id; })[0]; if (c) setBrush(c.color); }
+      renderCalendar();
+    });
+    host.appendChild(b);
+  }
+  chip("tap", state.tap.label || "Tap counter", null);
+  state.counters.forEach(function(c){ chip(c.id, c.name || "Untitled", c.color); });
+}
+function renderCalendar(){
+  renderTasks();
+  var days = taskDays();
+  var st = streakStats();
+  $("stCur").textContent = st.cur;
+  $("stMax").textContent = st.best;
+  $("stTotal").textContent = st.total;
+  $("calTitle").textContent = MONTHS[calView.m] + " " + calView.y;
+
+  var grid = $("calGrid"); grid.textContent = "";
+  var first = new Date(calView.y, calView.m, 1).getDay();
+  var count = new Date(calView.y, calView.m + 1, 0).getDate();
+  var today = todayKey();
+  for (var i = 0; i < first; i++){
+    var b = document.createElement("div"); b.className = "day blank"; grid.appendChild(b);
+  }
+  for (var d = 1; d <= count; d++){
+    (function(d){
+      var key = dayKey(calView.y, calView.m, d), col = days[key];
+      var cell = document.createElement("button");
+      cell.className = "day" + (col ? " painted" : "") + (key === today ? " today" : "");
+      cell.textContent = d;
+      cell.setAttribute("aria-label", MONTHS[calView.m] + " " + d + (col ? ", painted" : ""));
+      if (col){ cell.style.background = col; cell.style.color = inkOn(col); }
+      cell.addEventListener("click", function(){ paintDay(key); });
+      grid.appendChild(cell);
+    })(d);
+  }
+}
+function paintDay(key){
+  var days = taskDays(), cur = days[key];
+  if (cur && cur.toLowerCase() === brush.toLowerCase()) delete days[key];
+  else days[key] = brush;
+  tick(); persist(); renderCalendar();
+}
+function shiftMonth(delta){
+  var d = new Date(calView.y, calView.m + delta, 1);
+  calView.y = d.getFullYear(); calView.m = d.getMonth();
+  renderCalendar();
+}
+function syncBrush(){
+  Array.prototype.forEach.call(document.querySelectorAll(".brushsw"), function(b){
+    b.setAttribute("aria-pressed", b.dataset.color.toLowerCase() === brush.toLowerCase() ? "true" : "false");
+  });
+  $("brushCustom").value = brush;
+}
+function setBrush(col){
+  brush = col;
+  try{ localStorage.setItem(BRUSH_KEY, col); }catch(e){}
+  syncBrush();
+}
+function buildCalendar(){
+  var wk = $("calWeek"); wk.textContent = "";
+  WEEKDAYS.forEach(function(w){ var s = document.createElement("span"); s.textContent = w; wk.appendChild(s); });
+  function fill(host, colors){
+    host.textContent = "";
+    colors.forEach(function(col){
+      var b = document.createElement("button");
+      b.className = "sw brushsw"; b.style.background = col; b.dataset.color = col;
+      b.setAttribute("aria-label", "Colour " + col); b.setAttribute("aria-pressed", "false");
+      b.addEventListener("click", function(){ setBrush(col); });
+      host.appendChild(b);
+    });
+  }
+  fill($("brushPastel"), PASTELS); fill($("brushDeep"), DEEP);
+  syncBrush();
+}
+$("brushCustom").addEventListener("input", function(e){ setBrush(e.target.value); });
+$("calPrev").addEventListener("click", function(){ shiftMonth(-1); });
+$("calNext").addEventListener("click", function(){ shiftMonth(1); });
+$("calTitle").addEventListener("click", function(){
+  var n = new Date(); calView.y = n.getFullYear(); calView.m = n.getMonth(); renderCalendar();
+});
+document.addEventListener("visibilitychange", function(){ if (!document.hidden && state.mode === "cal") renderCalendar(); });
+
 /* ---------- wiring ---------- */
 $("mTap").addEventListener("click", function(){ setMode("tap"); });
 $("mMulti").addEventListener("click", function(){ setMode("multi"); });
+$("mCal").addEventListener("click", function(){ setMode("cal"); });
 $("btnAdd").addEventListener("click", function(){ openCounterSheet(null); });
 $("multiSave").addEventListener("click", function(){ openSaveSheet("counters"); });
 $("tapSave").addEventListener("click", function(){ openSaveSheet("tap"); });
@@ -782,11 +1000,12 @@ document.addEventListener("keydown", function(e){
 
 window.addEventListener("storage", function(e){
   if (e.key !== KEY || !e.newValue) return;
-  try{ adopt(JSON.parse(e.newValue)); renderTap(); renderCounters(); renderLog(); }catch(err){}
+  try{ adopt(JSON.parse(e.newValue)); renderTap(); renderCounters(); renderLog(); renderCalendar(); }catch(err){}
 });
 
 load();
 buildSwatches();
+buildCalendar();
 setMode(state.mode);
 renderTap();
 renderCounters();
