@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F2F5F7">
 <title>Tally counter</title>
+<link rel="icon" href="data:,">
 <style>
 :root{
   --paper:#F2F5F7;
@@ -43,6 +44,7 @@ body{
 }
 button,input{font:inherit;color:inherit}
 button{background:none;border:0;padding:0;cursor:pointer}
+[hidden]{display:none !important}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
 #app{height:100%;display:flex;flex-direction:column;max-width:760px;margin:0 auto;width:100%}
@@ -93,7 +95,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .save:active{transform:translateY(1px)}
 
 .list{flex:1;min-height:0;overflow-y:auto;padding:4px 14px 8px;display:flex;flex-direction:column;gap:10px}
-.row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid rgba(0,0,0,.10);
+.row{flex:none;display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid rgba(0,0,0,.10);
   border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);overflow:hidden}
 .meta{flex:1;min-width:0;text-align:left;padding:2px 0}
 .name{font-weight:650;font-size:16.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -161,7 +163,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
 
 @media (max-width:420px){
   .topbar{gap:6px}
-  .switch button{padding:7px 11px}
+  .switch button{padding:7px 12px}
 }
 
 .cal{flex:1;min-height:0;overflow-y:auto;padding:6px 14px 24px;display:flex;flex-direction:column;gap:16px;align-items:center}
@@ -179,7 +181,6 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .day.blank{visibility:hidden;border:0}
 .day.today{outline:2px solid var(--accent);outline-offset:1px}
 .day.painted{border-color:rgba(0,0,0,.10)}
-.brushlabel{font-size:12.5px;color:var(--muted);font-weight:650;margin-bottom:7px}
 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:none;display:inline-flex;align-items:center;gap:7px;max-width:200px;padding:8px 14px;border-radius:999px;
@@ -188,6 +189,54 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .chip i{flex:none;width:10px;height:10px;border-radius:99px;border:1px solid rgba(0,0,0,.25)}
 .chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .calhint{font-size:13px;color:var(--muted);margin:8px 0 0}
+
+.today{padding:2px 14px 12px}
+.todaytop{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+.todaytop b{font-size:16.5px}
+.todaytop span{font-size:13.5px;color:var(--muted);font-weight:650}
+.bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .2s}
+@media (prefers-reduced-motion: reduce){.bar i{transition:none}}
+
+.grip{flex:none;width:30px;height:46px;margin:-6px 0 -6px -8px;display:grid;place-items:center;
+  opacity:.6;touch-action:none;cursor:grab;color:inherit}
+.grip:hover{opacity:.9}
+.grip{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.grip svg{width:18px;height:18px;fill:currentColor}
+.row.dragging{position:relative;z-index:5;box-shadow:0 12px 32px rgba(0,0,0,.30);cursor:grabbing}
+.row.dragging .grip{cursor:grabbing}
+.pips{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.pip{width:10px;height:10px;border-radius:99px;border:1.5px solid currentColor;opacity:.55}
+.pip.on{background:currentColor;opacity:1}
+.tickbtn{flex:none;width:46px;height:46px;border-radius:999px;border:2px solid currentColor;
+  display:grid;place-items:center;color:inherit;opacity:.85;margin-left:4px}
+.tickbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.tickbtn.on{background:currentColor;opacity:1}
+.tickbtn.on svg{stroke:var(--rowbg)}
+.tickbtn:active{transform:scale(.95)}
+.row.selecting{cursor:pointer}
+.row.picked{box-shadow:0 0 0 3px var(--ink)}
+.pickbox{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid currentColor;display:grid;place-items:center;opacity:.8}
+.pickbox svg{width:16px;height:16px;fill:none;stroke:var(--rowbg);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;display:none}
+.pickbox.on{background:currentColor;opacity:1}
+.pickbox.on svg{display:block}
+
+.save.quiet{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.save.danger{background:var(--danger);color:#fff}
+.save:disabled{opacity:.4;box-shadow:none}
+.footer.sel{gap:10px}
+.footer.sel .save{flex:1;padding:0 8px;height:56px;font-size:15px;white-space:nowrap}
+
+.freqrow{display:flex;align-items:center;gap:12px}
+.freqrow .step{opacity:1;border-color:var(--line);background:var(--paper)}
+.freqrow .step:disabled{opacity:.35}
+.freqval{min-width:34px;text-align:center;font-size:24px;font-weight:750;font-variant-numeric:tabular-nums}
+.freqhint{font-size:13.5px;color:var(--muted);font-weight:600}
+
+.tallyrow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:30px}
+.tallyrow .marks{justify-content:flex-start;max-width:none;min-height:24px;flex:1;min-width:0}
+.tallytxt{flex:none;font-size:13px;color:var(--muted);font-weight:650}
+.day:disabled{opacity:.4}
 
 .toast{position:fixed;left:50%;transform:translate(-50%,20px);bottom:calc(88px + env(safe-area-inset-bottom,0px));
   background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:999px;font-size:14.5px;font-weight:600;
@@ -199,9 +248,9 @@ button{background:none;border:0;padding:0;cursor:pointer}
 <div id="app">
   <div class="topbar">
     <div class="switch" role="group" aria-label="Mode">
-      <button id="mTap" aria-pressed="true">Tap</button>
-      <button id="mMulti" aria-pressed="false">Counters</button>
+      <button id="mMulti" aria-pressed="true">Today</button>
       <button id="mCal" aria-pressed="false">Days</button>
+      <button id="mTap" aria-pressed="false">Tap</button>
     </div>
     <div class="spacer"></div>
     <button class="icon-btn" id="btnHistory" aria-label="Saved entries">
@@ -216,7 +265,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
     </button>
   </div>
 
-  <section class="screen active" id="screenTap">
+  <section class="screen" id="screenTap">
     <div class="labelrow">
       <button class="labelbtn" id="tapLabel">
         <span id="tapLabelText">Add a name</span>
@@ -236,13 +285,22 @@ button{background:none;border:0;padding:0;cursor:pointer}
     </div>
   </section>
 
-  <section class="screen" id="screenMulti">
+  <section class="screen active" id="screenMulti">
+    <div class="today" id="todayBar" hidden>
+      <div class="todaytop"><b id="todayDate"></b><span id="todayCount"></span></div>
+      <div class="bar"><i id="todayFill"></i></div>
+    </div>
     <div class="list" id="counterList"></div>
-    <div class="footer">
-      <button class="round" id="btnAdd" aria-label="New counter">
+    <div class="footer" id="footNormal">
+      <button class="round" id="btnAdd" aria-label="New task">
         <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
       </button>
-      <button class="save" id="multiSave">Save</button>
+      <button class="save quiet" id="btnSelect" hidden>Select</button>
+    </div>
+    <div class="footer sel" id="footSelect" hidden>
+      <button class="save quiet" id="selCancel">Cancel</button>
+      <button class="save quiet" id="selAll">Select all</button>
+      <button class="save danger" id="selDelete" disabled>Delete</button>
     </div>
   </section>
 
@@ -252,8 +310,9 @@ button{background:none;border:0;padding:0;cursor:pointer}
       <div class="stats">
         <div class="stat"><b id="stCur">0</b><span>Current streak</span></div>
         <div class="stat"><b id="stMax">0</b><span>Max streak</span></div>
-        <div class="stat"><b id="stTotal">0</b><span>Total days</span></div>
+        <div class="stat"><b id="stTotal">0</b><span>Days completed</span></div>
       </div>
+      <div class="tallyrow"><div class="marks" id="calMarks"></div><span class="tallytxt" id="calChecks"></span></div>
       <div class="monthnav">
         <button class="icon-btn" id="calPrev" aria-label="Previous month">
           <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
@@ -267,16 +326,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
         <div class="wk" id="calWeek"></div>
         <div class="grid" id="calGrid" style="margin-top:6px"></div>
       </div>
-      <div>
-        <div class="brushlabel">Colour to paint with</div>
-        <div class="swatches" id="brushPastel"></div>
-        <div class="swatches" id="brushDeep"></div>
-        <div class="customrow">
-          <input type="color" id="brushCustom" aria-label="Custom colour">
-          <span style="font-size:13.5px;color:var(--muted)">or pick your own</span>
-        </div>
-        <p class="calhint">Pick a task above, then tap a day to paint it. Tap a painted day with the same colour to clear it.</p>
-      </div>
+      <p class="calhint" id="calHint"></p>
     </div>
   </section>
 </div>
@@ -284,13 +334,24 @@ button{background:none;border:0;padding:0;cursor:pointer}
 <div class="scrim" id="scrim"></div>
 
 <div class="sheet" id="sheetCounter" role="dialog" aria-modal="true" aria-labelledby="sheetCounterTitle">
-  <h2 id="sheetCounterTitle">New counter</h2>
+  <h2 id="sheetCounterTitle">New task</h2>
   <label class="field"><span>Name</span><input type="text" id="cName" autocomplete="off"></label>
   <label class="field"><span>Tag</span><input type="text" id="cTag" autocomplete="off"></label>
+  <div class="field">
+    <span>Times per day</span>
+    <div class="freqrow">
+      <button class="step" id="cFreqMinus" aria-label="Fewer times"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+      <div class="freqval" id="cFreqVal">1</div>
+      <button class="step" id="cFreqPlus" aria-label="More times"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+      <span class="freqhint" id="cFreqHint"></span>
+    </div>
+  </div>
   <div class="field">
     <span>Colour</span>
     <div class="swlabel">Pastels</div>
     <div class="swatches" id="swPastel"></div>
+    <div class="swlabel">Medium</div>
+    <div class="swatches" id="swMid"></div>
     <div class="swlabel">Deeper</div>
     <div class="swatches" id="swDeep"></div>
     <div class="customrow">
@@ -300,11 +361,11 @@ button{background:none;border:0;padding:0;cursor:pointer}
   </div>
   <div class="actions">
     <button class="btn-quiet" id="cCancel">Cancel</button>
-    <button class="btn-primary" id="cSave">Add counter</button>
+    <button class="btn-primary" id="cSave">Add task</button>
   </div>
   <div class="linkrow" id="cEditExtras" hidden>
-    <button class="linkbtn" id="cReset">Reset to zero</button>
-    <button class="linkbtn danger" id="cDelete">Delete counter</button>
+    <button class="linkbtn" id="cReset">Clear today</button>
+    <button class="linkbtn danger" id="cDelete">Delete task</button>
   </div>
 </div>
 
@@ -365,11 +426,12 @@ button{background:none;border:0;padding:0;cursor:pointer}
 "use strict";
 
 var PASTELS = ["#F6C7BD","#F7DDA6","#E5E5A8","#C6E5B4","#B4E1D8","#BCD7F2","#CEC8EF","#F2C5DE"];
+var MID     = ["#ED9C8C","#ECBC6A","#C0CA76","#8AC290","#71C0B6","#7EABDD","#A598DA","#DE8CB6"];
 var DEEP    = ["#E4705C","#E09A2E","#9BAF45","#4FA06B","#2E9E93","#3F7FC8","#7C68C4","#C9538F"];
 var DEFAULT_COLOR = PASTELS[4];
 var KEY = "tallyCounter.v1";
 
-var state = { mode:"tap", tap:{ label:"", value:0, days:{} }, counters:[], log:[], updatedAt:0 };
+var state = { mode:"multi", tap:{ label:"", value:0 }, counters:[], log:[], updatedAt:0 };
 
 function load(){
   try{
@@ -378,41 +440,56 @@ function load(){
     var d = JSON.parse(raw);
     if (d && typeof d === "object"){ adopt(d); state.updatedAt = Number(d.updatedAt) || 0; }
   }catch(e){}
-  try{ var m = localStorage.getItem(KEY + ".mode"); if (m) state.mode = m; }catch(e){}
+  try{ var m = localStorage.getItem(KEY + ".mode"); if (m === "multi" || m === "cal") state.mode = m; }catch(e){}
 }
-function cleanDays(src){
+function clampFreq(v){
+  var n = Math.floor(Number(v));
+  return n >= 1 ? Math.min(n, 50) : 1;
+}
+// Maps date -> number of check-offs. Older saves stored date -> colour for painted days;
+// those carry over as fully completed days.
+function cleanDone(src, freq){
   var out = {};
   if (src && typeof src === "object" && !Array.isArray(src)){
     Object.keys(src).forEach(function(k){
-      if (/^\d{4}-\d{2}-\d{2}$/.test(k) && /^#[0-9a-fA-F]{3,8}$/.test(src[k] || "")) out[k] = src[k];
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(k)) return;
+      var v = src[k], n;
+      if (typeof v === "string") n = /^#[0-9a-fA-F]{3,8}$/.test(v) ? freq : 0;
+      else n = Math.floor(Number(v)) || 0;
+      if (n > 0) out[k] = Math.min(n, 999);
     });
   }
   return out;
 }
 function adopt(d){
-  if (d.tap) state.tap = { label: String(d.tap.label || ""), value: Math.max(0, Number(d.tap.value) || 0),
-    days: cleanDays(d.tap.days || d.days) };
+  if (d.tap) state.tap = { label: String(d.tap.label || ""), value: Math.max(0, Number(d.tap.value) || 0) };
   if (Array.isArray(d.counters)) state.counters = d.counters.map(function(c){
+    var freq = clampFreq(c.freq);
     return { id: String(c.id || uid()), name: String(c.name || ""), tag: String(c.tag || ""),
       color: /^#[0-9a-fA-F]{3,8}$/.test(c.color || "") ? c.color : DEFAULT_COLOR,
-      value: Math.max(0, Number(c.value) || 0), createdAt: c.createdAt || nowISO(), days: cleanDays(c.days) };
+      freq: freq, done: cleanDone(c.done || c.days, freq), createdAt: c.createdAt || nowISO() };
   });
   if (Array.isArray(d.log)) state.log = d.log.map(function(e){
     return { id: String(e.id || uid()), name: String(e.name || ""), kind: e.kind === "counters" ? "counters" : "tap",
       total: Number(e.total) || 0, detail: String(e.detail || ""), at: e.at || nowISO() };
   });
 }
-var saveTimer;
+var saveTimer = 0;
+function writeNow(){
+  clearTimeout(saveTimer); saveTimer = 0;
+  try{
+    localStorage.setItem(KEY, JSON.stringify({ tap:state.tap, counters:state.counters,
+      log:state.log, updatedAt: state.updatedAt }));
+  }catch(e){ toast("Could not save. Browser storage is blocked or full."); }
+}
 function persist(fromRemote){
   if (!fromRemote){ state.updatedAt = Date.now(); schedulePush(); }
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(function(){
-    try{
-      localStorage.setItem(KEY, JSON.stringify({ tap:state.tap, counters:state.counters,
-        log:state.log, updatedAt: state.updatedAt }));
-    }catch(e){ toast("Could not save. Browser storage is blocked or full."); }
-  }, 250);
+  saveTimer = setTimeout(writeNow, 250);
 }
+// A tick made just before closing the tab or switching apps must not be lost to the 250 ms delay.
+window.addEventListener("pagehide", function(){ if (saveTimer) writeNow(); });
+document.addEventListener("visibilitychange", function(){ if (document.hidden && saveTimer) writeNow(); });
 
 var $ = function(id){ return document.getElementById(id); };
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
@@ -479,46 +556,243 @@ function inkOn(hex){
   var c = rgbOf(hex);
   var lin = c.map(function(v){ v /= 255; return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); });
   var L = 0.2126*lin[0] + 0.7152*lin[1] + 0.0722*lin[2];
-  return L > 0.42 ? "#18212B" : "#FFFFFF";
+  return L > 0.30 ? "#18212B" : "#FFFFFF";
+}
+/* ---------- tasks (daily checklist) ---------- */
+var selecting = false, selected = {};
+var SVG_CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+var SVG_PLUS  = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
+var SVG_MINUS = '<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>';
+var SVG_GRIP  = '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/><circle cx="9" cy="12" r="1.8"/><circle cx="15" cy="12" r="1.8"/><circle cx="9" cy="18" r="1.8"/><circle cx="15" cy="18" r="1.8"/></svg>';
+
+function mk(tag, cls, text){
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+function findTask(id){ return state.counters.filter(function(x){ return x.id === id; })[0]; }
+function pad2(n){ return (n < 10 ? "0" : "") + n; }
+function dayKey(y, m, d){ return y + "-" + pad2(m + 1) + "-" + pad2(d); }
+function todayKey(){ var n = new Date(); return dayKey(n.getFullYear(), n.getMonth(), n.getDate()); }
+function dayNum(key){ var p = key.split("-"); return Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000); }
+function doneOn(c, key){ return c.done[key] || 0; }
+// A task counts on a day from the day it was made, or on any earlier day that has a check-off.
+function startKey(c){
+  var d = new Date(c.createdAt);
+  return isNaN(d) ? "0000-00-00" : dayKey(d.getFullYear(), d.getMonth(), d.getDate());
+}
+function applies(c, key){ return key >= startKey(c) || !!c.done[key]; }
+
+function buildRow(c){
+  var n = doneOn(c, todayKey()), full = n >= c.freq;
+  var row = mk("div", "row" + (full ? " complete" : "") + (selecting ? " selecting" : "") + (selected[c.id] ? " picked" : ""));
+  row.dataset.id = c.id;
+  row.style.background = c.color;
+  row.style.color = inkOn(c.color);
+  row.style.setProperty("--rowbg", c.color);
+
+  if (selecting){
+    var box = mk("span", "pickbox" + (selected[c.id] ? " on" : ""));
+    box.innerHTML = SVG_CHECK;
+    row.appendChild(box);
+    row.addEventListener("click", function(){ toggleSelect(c.id); });
+  } else {
+    var grip = mk("button", "grip");
+    grip.setAttribute("aria-label", "Reorder. Drag, or use the up and down arrow keys.");
+    grip.innerHTML = SVG_GRIP;
+    grip.addEventListener("pointerdown", function(e){ startDrag(e, row); });
+    grip.addEventListener("keydown", function(e){
+      if (e.key === "ArrowUp" || e.key === "ArrowDown"){ e.preventDefault(); moveTask(c.id, e.key === "ArrowUp" ? -1 : 1); }
+    });
+    row.appendChild(grip);
+  }
+
+  var meta = mk("button", "meta");
+  meta.setAttribute("aria-label", selecting ? "Select task" : "Edit task");
+  meta.appendChild(mk("div", "name" + (c.name ? "" : " blank"), c.name || "Untitled"));
+  if (c.tag) meta.appendChild(mk("span", "tag", c.tag));
+  if (c.freq > 1){
+    if (c.freq <= 10){
+      var pips = mk("div", "pips");
+      for (var i = 0; i < c.freq; i++) pips.appendChild(mk("span", "pip" + (i < n ? " on" : "")));
+      meta.appendChild(pips);
+    } else {
+      meta.appendChild(mk("div", "tag", n + " of " + c.freq + " today"));
+    }
+  }
+  if (!selecting) meta.addEventListener("click", function(){ openCounterSheet(c.id); });
+  row.appendChild(meta);
+
+  if (!selecting){
+    var st = mk("div", "stepper");
+    if (c.freq > 1 && n > 0){
+      var minus = mk("button", "step");
+      minus.setAttribute("aria-label", "Undo one");
+      minus.innerHTML = SVG_MINUS;
+      minus.addEventListener("click", function(){ bumpTask(c.id, -1); });
+      st.appendChild(minus);
+    }
+    var tickBtn = mk("button", "tickbtn" + (full ? " on" : ""));
+    tickBtn.setAttribute("aria-label", c.freq === 1 ? (full ? "Mark not done" : "Mark done") : (full ? "Completed" : "Add one"));
+    tickBtn.innerHTML = full ? SVG_CHECK : (c.freq > 1 ? SVG_PLUS : "");
+    tickBtn.addEventListener("click", function(){ tapTask(c.id); });
+    st.appendChild(tickBtn);
+    row.appendChild(st);
+  }
+  return row;
+}
+function refreshRow(id){
+  var c = findTask(id), rows = $("counterList").children;
+  for (var i = 0; i < rows.length; i++){
+    if (rows[i].dataset.id === id && c){ rows[i].replaceWith(buildRow(c)); break; }
+  }
+  renderSummary();
+}
+function renderSummary(){
+  var total = state.counters.length;
+  $("todayBar").hidden = !total;
+  if (!total) return;
+  var t = todayKey(), done = 0, part = 0;
+  state.counters.forEach(function(c){
+    var n = doneOn(c, t);
+    if (n >= c.freq) done++;
+    part += Math.min(n, c.freq) / c.freq;
+  });
+  $("todayDate").textContent = new Date().toLocaleDateString(undefined, { weekday:"short", day:"numeric", month:"short" });
+  $("todayCount").textContent = done === total ? "All done" : done + " of " + total + " done";
+  $("todayFill").style.width = Math.round(part / total * 100) + "%";
 }
 function renderCounters(){
-  var list = $("counterList"); list.textContent = "";
+  var list = $("counterList"), keep = list.scrollTop;
+  list.textContent = "";
+  renderSummary();
+  $("btnSelect").hidden = !state.counters.length;
   if (!state.counters.length){
-    var e = document.createElement("div"); e.className = "empty";
-    var h = document.createElement("h2"); h.textContent = "No counters yet";
-    var p = document.createElement("p"); p.textContent = "Make one for each thing you want to track \u2014 name it, tag it, give it a colour.";
-    var b = document.createElement("button"); b.className = "ghost"; b.textContent = "New counter";
+    var e = mk("div", "empty");
+    e.appendChild(mk("h2", null, "No tasks yet"));
+    e.appendChild(mk("p", null, "Add the things you want to do each day. Set how many times a day each one needs, and tick them off here."));
+    var b = mk("button", "ghost", "New task");
     b.addEventListener("click", function(){ openCounterSheet(null); });
-    e.appendChild(h); e.appendChild(p); e.appendChild(b); list.appendChild(e); return;
+    e.appendChild(b); list.appendChild(e); return;
   }
-  state.counters.forEach(function(c){
-    var row = document.createElement("div"); row.className = "row";
-    row.style.background = c.color;
-    row.style.color = inkOn(c.color);
-
-    var meta = document.createElement("button"); meta.className = "meta";
-    meta.setAttribute("aria-label", "Edit counter");
-    var nm = document.createElement("div"); nm.className = "name" + (c.name ? "" : " blank");
-    nm.textContent = c.name || "Untitled";
-    meta.appendChild(nm);
-    if (c.tag){ var tg = document.createElement("span"); tg.className = "tag"; tg.textContent = c.tag; meta.appendChild(tg); }
-    meta.addEventListener("click", function(){ openCounterSheet(c.id); });
-    row.appendChild(meta);
-
-    var st = document.createElement("div"); st.className = "stepper";
-    var minus = document.createElement("button"); minus.className = "step"; minus.setAttribute("aria-label","Subtract one");
-    minus.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>';
-    minus.addEventListener("click", function(){ bump(c.id, -1); });
-    var val = document.createElement("div"); val.className = "val"; val.id = "val-" + c.id;
-    val.textContent = c.value;
-    val.style.background = inkOn(c.color) === "#FFFFFF" ? "rgba(255,255,255,.20)" : "rgba(255,255,255,.55)";
-    var plus = document.createElement("button"); plus.className = "step"; plus.setAttribute("aria-label","Add one");
-    plus.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
-    plus.addEventListener("click", function(){ bump(c.id, 1); });
-    st.appendChild(minus); st.appendChild(val); st.appendChild(plus);
-    row.appendChild(st); list.appendChild(row);
-  });
+  state.counters.forEach(function(c){ list.appendChild(buildRow(c)); });
+  list.scrollTop = keep;
 }
+
+/* check-offs for today */
+function bumpTask(id, delta){
+  var c = findTask(id);
+  if (!c) return;
+  var t = todayKey(), n = doneOn(c, t) + delta;
+  if (n < 0 || n > c.freq) return;
+  if (n === 0) delete c.done[t]; else c.done[t] = n;
+  tick(); persist(); refreshRow(id);
+}
+function tapTask(id){
+  var c = findTask(id);
+  if (!c) return;
+  var n = doneOn(c, todayKey());
+  if (c.freq === 1) bumpTask(id, n ? -1 : 1);
+  else if (n < c.freq) bumpTask(id, 1);
+}
+
+/* reordering */
+function commitOrder(){
+  var rows = $("counterList").children, order = [], byId = {};
+  for (var i = 0; i < rows.length; i++) if (rows[i].dataset.id) order.push(rows[i].dataset.id);
+  state.counters.forEach(function(c){ byId[c.id] = c; });
+  var next = order.map(function(id){ return byId[id]; }).filter(Boolean);
+  if (next.length !== state.counters.length) return;
+  var changed = next.some(function(c, i){ return c !== state.counters[i]; });
+  if (changed){ state.counters = next; persist(); }
+}
+function moveTask(id, delta){
+  var a = state.counters, i = -1;
+  for (var k = 0; k < a.length; k++) if (a[k].id === id){ i = k; break; }
+  var j = i + delta;
+  if (i < 0 || j < 0 || j >= a.length) return;
+  var x = a.splice(i, 1)[0];
+  a.splice(j, 0, x);
+  persist(); renderCounters();
+  var rows = $("counterList").children;
+  for (var r = 0; r < rows.length; r++){
+    if (rows[r].dataset.id === id){ var g = rows[r].querySelector(".grip"); if (g) g.focus(); }
+  }
+}
+function startDrag(e, row){
+  if (e.button != null && e.button !== 0) return;
+  e.preventDefault();
+  var list = $("counterList"), grip = e.currentTarget;
+  try{ grip.setPointerCapture(e.pointerId); }catch(err){}
+  var startY = e.clientY, lastY = e.clientY, raf = 0;
+  var gap = parseFloat(getComputedStyle(list).rowGap) || 10;
+  row.classList.add("dragging");
+
+  // Swap with a neighbour whenever the dragged row's centre passes that neighbour's centre,
+  // and shift the start point by the same distance so the row stays under the pointer.
+  function place(){
+    for (var guard = 0; guard < 60; guard++){
+      row.style.transform = "translateY(" + (lastY - startY) + "px)";
+      var r = row.getBoundingClientRect(), mid = r.top + r.height / 2;
+      var next = row.nextElementSibling, prev = row.previousElementSibling, moved = false;
+      if (next){
+        var nr = next.getBoundingClientRect();
+        if (mid > nr.top + nr.height / 2){ list.insertBefore(next, row); startY += nr.height + gap; moved = true; }
+      }
+      if (!moved && prev){
+        var pr = prev.getBoundingClientRect();
+        if (mid < pr.top + pr.height / 2){ list.insertBefore(row, prev); startY -= pr.height + gap; moved = true; }
+      }
+      if (!moved) return;
+    }
+  }
+  function auto(){
+    var lr = list.getBoundingClientRect(), edge = 56, v = 0;
+    if (lastY < lr.top + edge) v = -Math.ceil((lr.top + edge - lastY) / 6);
+    else if (lastY > lr.bottom - edge) v = Math.ceil((lastY - (lr.bottom - edge)) / 6);
+    if (v){
+      var before = list.scrollTop;
+      list.scrollTop += v;
+      var moved = list.scrollTop - before;
+      if (moved){ startY -= moved; place(); }
+    }
+    raf = requestAnimationFrame(auto);
+  }
+  function onMove(ev){ lastY = ev.clientY; place(); }
+  function end(){
+    cancelAnimationFrame(raf);
+    grip.removeEventListener("pointermove", onMove);
+    grip.removeEventListener("pointerup", end);
+    grip.removeEventListener("pointercancel", end);
+    row.classList.remove("dragging");
+    row.style.transform = "";
+    commitOrder();
+  }
+  grip.addEventListener("pointermove", onMove);
+  grip.addEventListener("pointerup", end);
+  grip.addEventListener("pointercancel", end);
+  raf = requestAnimationFrame(auto);
+}
+
+/* select and delete */
+function updateSelectUI(){
+  var n = Object.keys(selected).length, all = state.counters.length;
+  $("selDelete").textContent = n ? "Delete (" + n + ")" : "Delete";
+  $("selDelete").disabled = !n;
+  $("selAll").textContent = (all && n === all) ? "Clear" : "Select all";
+}
+function setSelecting(on){
+  selecting = on; selected = {};
+  $("footNormal").hidden = on;
+  $("footSelect").hidden = !on;
+  renderCounters(); updateSelectUI();
+}
+function toggleSelect(id){
+  if (selected[id]) delete selected[id]; else selected[id] = true;
+  refreshRow(id); updateSelectUI();
+}
+
 function renderLog(){
   var wrap = $("logList"); wrap.textContent = "";
   if (!state.log.length){
@@ -546,29 +820,22 @@ function renderLog(){
 
 /* ---------- actions ---------- */
 function setMode(m){
+  if (selecting && m !== "multi") setSelecting(false);
   state.mode = m;
   try{ localStorage.setItem(KEY + ".mode", m); }catch(e){}
-  $("mTap").setAttribute("aria-pressed", m === "tap" ? "true" : "false");
   $("mMulti").setAttribute("aria-pressed", m === "multi" ? "true" : "false");
   $("mCal").setAttribute("aria-pressed", m === "cal" ? "true" : "false");
-  $("screenTap").classList.toggle("active", m === "tap");
+  $("mTap").setAttribute("aria-pressed", m === "tap" ? "true" : "false");
   $("screenMulti").classList.toggle("active", m === "multi");
   $("screenCal").classList.toggle("active", m === "cal");
+  $("screenTap").classList.toggle("active", m === "tap");
+  if (m === "multi") renderCounters();
   if (m === "cal") renderCalendar();
 }
 function tapBump(delta){
   var next = state.tap.value + delta;
   if (next < 0) return;
   state.tap.value = next; renderTap(); tick(); persist();
-}
-function bump(id, delta){
-  var c = state.counters.filter(function(x){ return x.id === id; })[0];
-  if (!c) return;
-  var next = c.value + delta;
-  if (next < 0) return;
-  c.value = next;
-  var el = $("val-" + id); if (el) el.textContent = c.value;
-  tick(); persist();
 }
 
 var openSheetEl = null;
@@ -581,9 +848,12 @@ function closeSheet(){
   openSheetEl = null; $("scrim").classList.remove("open");
 }
 $("scrim").addEventListener("click", closeSheet);
-document.addEventListener("keydown", function(e){ if (e.key === "Escape" && openSheetEl) closeSheet(); });
+document.addEventListener("keydown", function(e){
+  if (e.key !== "Escape") return;
+  if (openSheetEl) closeSheet(); else if (selecting) setSelecting(false);
+});
 
-var editingId = null, pickedColor = DEFAULT_COLOR;
+var editingId = null, pickedColor = DEFAULT_COLOR, pickedFreq = 1;
 function buildSwatches(){
   function fill(host, colors){
     host.textContent = "";
@@ -595,7 +865,7 @@ function buildSwatches(){
       host.appendChild(b);
     });
   }
-  fill($("swPastel"), PASTELS); fill($("swDeep"), DEEP);
+  fill($("swPastel"), PASTELS); fill($("swMid"), MID); fill($("swDeep"), DEEP);
 }
 function syncSwatches(){
   Array.prototype.forEach.call(document.querySelectorAll(".sw"), function(b){
@@ -603,15 +873,24 @@ function syncSwatches(){
   });
   $("cCustom").value = pickedColor;
 }
+function syncFreq(){
+  $("cFreqVal").textContent = pickedFreq;
+  $("cFreqMinus").disabled = pickedFreq <= 1;
+  $("cFreqPlus").disabled = pickedFreq >= 50;
+  $("cFreqHint").textContent = pickedFreq === 1 ? "once a day" : pickedFreq + " times a day";
+}
+$("cFreqMinus").addEventListener("click", function(){ if (pickedFreq > 1){ pickedFreq--; syncFreq(); } });
+$("cFreqPlus").addEventListener("click", function(){ if (pickedFreq < 50){ pickedFreq++; syncFreq(); } });
 function openCounterSheet(id){
   editingId = id;
-  var c = id ? state.counters.filter(function(x){ return x.id === id; })[0] : null;
-  $("sheetCounterTitle").textContent = c ? "Edit counter" : "New counter";
-  $("cSave").textContent = c ? "Save changes" : "Add counter";
+  var c = id ? findTask(id) : null;
+  $("sheetCounterTitle").textContent = c ? "Edit task" : "New task";
+  $("cSave").textContent = c ? "Save changes" : "Add task";
   $("cName").value = c ? c.name : "";
   $("cTag").value = c ? c.tag : "";
   pickedColor = c ? c.color : PASTELS[Math.floor(Math.random() * PASTELS.length)];
-  syncSwatches();
+  pickedFreq = c ? c.freq : 1;
+  syncSwatches(); syncFreq();
   $("cEditExtras").hidden = !c;
   openSheet($("sheetCounter"));
 }
@@ -620,55 +899,41 @@ $("cCancel").addEventListener("click", closeSheet);
 $("cSave").addEventListener("click", function(){
   var name = $("cName").value.trim(), tag = $("cTag").value.trim();
   if (editingId){
-    var c = state.counters.filter(function(x){ return x.id === editingId; })[0];
-    if (c){ c.name = name; c.tag = tag; c.color = pickedColor; }
+    var c = findTask(editingId);
+    if (c){
+      c.name = name; c.tag = tag; c.color = pickedColor; c.freq = pickedFreq;
+      var t = todayKey();
+      if (c.done[t] > c.freq) c.done[t] = c.freq;
+    }
   } else {
-    state.counters.push({ id: uid(), name: name, tag: tag, color: pickedColor, value: 0, createdAt: nowISO(), days: {} });
+    state.counters.push({ id: uid(), name: name, tag: tag, color: pickedColor, freq: pickedFreq, done: {}, createdAt: nowISO() });
   }
   persist(); renderCounters(); closeSheet();
 });
 $("cReset").addEventListener("click", function(){
-  var c = state.counters.filter(function(x){ return x.id === editingId; })[0];
-  if (c) c.value = 0;
-  persist(); renderCounters(); closeSheet(); toast("Counter reset to zero");
+  var c = findTask(editingId);
+  if (c) delete c.done[todayKey()];
+  persist(); renderCounters(); closeSheet(); toast("Cleared today");
 });
 $("cDelete").addEventListener("click", function(){
+  if (!window.confirm("Delete this task and its history?")) return;
   state.counters = state.counters.filter(function(x){ return x.id !== editingId; });
-  persist(); renderCounters(); closeSheet(); toast("Counter deleted");
+  persist(); renderCounters(); closeSheet(); toast("Task deleted");
 });
 
-var savingKind = "tap";
-function openSaveSheet(kind){
-  savingKind = kind;
+function openSaveSheet(){
   $("sName").value = "";
-  if (kind === "tap"){
-    $("sheetSaveTitle").textContent = "Save this count";
-    $("sPreview").textContent = "Total " + state.tap.value;
-    $("sSaveReset").textContent = "Save and reset";
-  } else {
-    if (!state.counters.length){ toast("Add a counter first"); return; }
-    $("sheetSaveTitle").textContent = "Save all counters";
-    $("sPreview").textContent = state.counters.map(function(c){ return (c.name || "Untitled") + " " + c.value; }).join(" \u00b7 ");
-    $("sSaveReset").textContent = "Save and reset all";
-  }
+  $("sheetSaveTitle").textContent = "Save this count";
+  $("sPreview").textContent = "Total " + state.tap.value;
+  $("sSaveReset").textContent = "Save and reset";
   openSheet($("sheetSave"));
   setTimeout(function(){ $("sName").focus(); }, 180);
 }
 function commitSave(reset){
-  var name = $("sName").value.trim(), entry;
-  if (savingKind === "tap"){
-    entry = { id: uid(), name: name, kind:"tap", total: state.tap.value, detail:"", at: nowISO() };
-  } else {
-    var total = state.counters.reduce(function(s,c){ return s + c.value; }, 0);
-    entry = { id: uid(), name: name, kind:"counters", total: total,
-      detail: state.counters.map(function(c){ return (c.name || "Untitled") + " " + c.value; }).join(", "), at: nowISO() };
-  }
+  var entry = { id: uid(), name: $("sName").value.trim(), kind:"tap", total: state.tap.value, detail:"", at: nowISO() };
   state.log.unshift(entry);
   if (state.log.length > 500) state.log = state.log.slice(0, 500);
-  if (reset){
-    if (savingKind === "tap"){ state.tap.value = 0; renderTap(); }
-    else { state.counters.forEach(function(c){ c.value = 0; }); renderCounters(); }
-  }
+  if (reset){ state.tap.value = 0; renderTap(); }
   persist(); renderLog(); closeSheet();
   toast(reset ? "Saved and reset" : "Saved");
 }
@@ -833,38 +1098,46 @@ window.addEventListener("focus", refreshFromServer);
 document.addEventListener("visibilitychange", refreshFromServer);
 
 /* ---------- calendar ---------- */
-var BRUSH_KEY = KEY + ".brush";
-var brush = DEEP[4];
-try{ var bsaved = localStorage.getItem(BRUSH_KEY); if (/^#[0-9a-fA-F]{6}$/.test(bsaved || "")) brush = bsaved; }catch(e){}
-var CALSEL_KEY = KEY + ".calsel";
-var calSel = "tap";
-try{ calSel = localStorage.getItem(CALSEL_KEY) || "tap"; }catch(e){}
-function selectedTask(){
-  if (calSel !== "tap"){
-    var c = state.counters.filter(function(x){ return x.id === calSel; })[0];
-    if (c) return c;
-  }
-  calSel = "tap";
-  return state.tap;
-}
-function taskDays(){
-  var t = selectedTask();
-  if (!t.days) t.days = {};
-  return t.days;
-}
+var calSel = "all";
 var calView = (function(){ var n = new Date(); return { y:n.getFullYear(), m:n.getMonth() }; })();
 var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 var WEEKDAYS = ["S","M","T","W","T","F","S"];
 
-function pad2(n){ return (n < 10 ? "0" : "") + n; }
-function dayKey(y, m, d){ return y + "-" + pad2(m + 1) + "-" + pad2(d); }
-function todayKey(){ var n = new Date(); return dayKey(n.getFullYear(), n.getMonth(), n.getDate()); }
-function dayNum(key){ var p = key.split("-"); return Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000); }
-
-// Current streak counts back from today. If today is not painted yet, it counts back
-// from yesterday, so the streak does not read zero until the day is actually missed.
-function streakStats(){
-  var nums = Object.keys(taskDays()).map(dayNum).sort(function(a, b){ return a - b; });
+function calTasks(){
+  if (calSel !== "all"){
+    var c = findTask(calSel);
+    if (c) return [c];
+    calSel = "all";
+  }
+  return state.counters;
+}
+function accentHex(){
+  var v = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+  return /^#[0-9a-fA-F]{6}$/.test(v) ? v : "#12594F";
+}
+// How done a day is across the given tasks: every task that applies has to hit its daily count.
+function dayInfo(list, key){
+  var applicable = 0, complete = 0, partial = 0;
+  list.forEach(function(c){
+    if (!applies(c, key)) return;
+    applicable++;
+    var n = doneOn(c, key);
+    if (n >= c.freq) complete++;
+    else if (n > 0) partial += n / c.freq;
+  });
+  return { applicable: applicable, complete: complete,
+    full: applicable > 0 && complete === applicable,
+    frac: applicable ? (complete + partial) / applicable : 0 };
+}
+// Current streak counts back from today. If today is not finished yet, it counts back from
+// yesterday, so the streak does not read zero until a day is actually missed.
+function calStats(list){
+  var keys = {}, checks = 0;
+  list.forEach(function(c){
+    Object.keys(c.done).forEach(function(k){ keys[k] = true; checks += c.done[k]; });
+  });
+  var nums = Object.keys(keys).filter(function(k){ return dayInfo(list, k).full; })
+    .map(dayNum).sort(function(a, b){ return a - b; });
   var have = {}, best = 0, run = 0, prev = null;
   nums.forEach(function(n){
     have[n] = true;
@@ -874,110 +1147,121 @@ function streakStats(){
   });
   var t = dayNum(todayKey()), cur = 0, c = have[t] ? t : t - 1;
   while (have[c]){ cur++; c--; }
-  return { cur: cur, best: best, total: nums.length };
+  return { cur: cur, best: best, total: nums.length, checks: checks };
 }
 
-function renderTasks(){
+function renderChips(){
   var host = $("calTasks"); host.textContent = "";
-  selectedTask();
   function chip(id, label, color){
-    var b = document.createElement("button");
-    b.className = "chip"; b.setAttribute("aria-pressed", id === calSel ? "true" : "false");
-    if (color){ var dot = document.createElement("i"); dot.style.background = color; b.appendChild(dot); }
-    var sp = document.createElement("span"); sp.textContent = label; b.appendChild(sp);
-    b.addEventListener("click", function(){
-      calSel = id;
-      try{ localStorage.setItem(CALSEL_KEY, id); }catch(e){}
-      if (id !== "tap"){ var c = state.counters.filter(function(x){ return x.id === id; })[0]; if (c) setBrush(c.color); }
-      renderCalendar();
-    });
+    var b = mk("button", "chip");
+    b.setAttribute("aria-pressed", id === calSel ? "true" : "false");
+    if (color){ var dot = mk("i"); dot.style.background = color; b.appendChild(dot); }
+    b.appendChild(mk("span", null, label));
+    b.addEventListener("click", function(){ calSel = id; renderCalendar(); });
     host.appendChild(b);
   }
-  chip("tap", state.tap.label || "Tap counter", null);
+  chip("all", "All tasks", null);
   state.counters.forEach(function(c){ chip(c.id, c.name || "Untitled", c.color); });
 }
 function renderCalendar(){
-  renderTasks();
-  var days = taskDays();
-  var st = streakStats();
+  var list = calTasks();
+  renderChips();
+  var st = calStats(list);
   $("stCur").textContent = st.cur;
   $("stMax").textContent = st.best;
   $("stTotal").textContent = st.total;
+  renderMarks($("calMarks"), st.checks);
+  $("calChecks").textContent = st.checks + (st.checks === 1 ? " check-off" : " check-offs");
   $("calTitle").textContent = MONTHS[calView.m] + " " + calView.y;
 
+  var one = calSel !== "all" ? list[0] : null;
+  var base = one ? one.color : accentHex();
   var grid = $("calGrid"); grid.textContent = "";
   var first = new Date(calView.y, calView.m, 1).getDay();
   var count = new Date(calView.y, calView.m + 1, 0).getDate();
   var today = todayKey();
-  for (var i = 0; i < first; i++){
-    var b = document.createElement("div"); b.className = "day blank"; grid.appendChild(b);
-  }
+  for (var i = 0; i < first; i++) grid.appendChild(mk("div", "day blank"));
   for (var d = 1; d <= count; d++){
     (function(d){
-      var key = dayKey(calView.y, calView.m, d), col = days[key];
-      var cell = document.createElement("button");
-      cell.className = "day" + (col ? " painted" : "") + (key === today ? " today" : "");
-      cell.textContent = d;
-      cell.setAttribute("aria-label", MONTHS[calView.m] + " " + d + (col ? ", painted" : ""));
-      if (col){ cell.style.background = col; cell.style.color = inkOn(col); }
-      cell.addEventListener("click", function(){ paintDay(key); });
+      var key = dayKey(calView.y, calView.m, d), info = dayInfo(list, key);
+      var cell = mk("button", "day" + (info.full ? " painted" : "") + (key === today ? " today" : ""), String(d));
+      var label = MONTHS[calView.m] + " " + d;
+      if (info.full) label += ", complete";
+      else if (info.frac > 0) label += ", partly done";
+      cell.setAttribute("aria-label", label);
+      if (info.full){ cell.style.background = base; cell.style.color = inkOn(base); }
+      else if (info.frac > 0){ cell.style.background = tint(base, 0.2 + 0.55 * info.frac); }
+      if (key > today || !list.length) cell.disabled = true;
+      cell.addEventListener("click", function(){ dayTap(key, list); });
       grid.appendChild(cell);
     })(d);
   }
+  $("calHint").textContent = !state.counters.length
+    ? "No tasks yet. Add some on the Today tab and they will show up here."
+    : (one
+      ? "Tap a day to add a check-off. After the last one it clears. Solid days are complete, paler days are partly done."
+      : "Every task has to be done for a day to count. Pick a task above for its own streaks, or to fix a missed day.");
 }
-function paintDay(key){
-  var days = taskDays(), cur = days[key];
-  if (cur && cur.toLowerCase() === brush.toLowerCase()) delete days[key];
-  else days[key] = brush;
-  tick(); persist(); renderCalendar();
+function dayTap(key, list){
+  if (calSel !== "all" && list.length === 1){
+    var c = list[0], n = doneOn(c, key) + 1;
+    if (n > c.freq) n = 0;
+    if (n === 0) delete c.done[key]; else c.done[key] = n;
+    tick(); persist(); renderCalendar();
+    return;
+  }
+  var info = dayInfo(list, key), p = key.split("-");
+  var when = new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString(undefined, { weekday:"short", day:"numeric", month:"short" });
+  toast(when + " · " + (info.applicable ? info.complete + " of " + info.applicable + " tasks done" : "no tasks yet"));
 }
 function shiftMonth(delta){
   var d = new Date(calView.y, calView.m + delta, 1);
   calView.y = d.getFullYear(); calView.m = d.getMonth();
   renderCalendar();
 }
-function syncBrush(){
-  Array.prototype.forEach.call(document.querySelectorAll(".brushsw"), function(b){
-    b.setAttribute("aria-pressed", b.dataset.color.toLowerCase() === brush.toLowerCase() ? "true" : "false");
-  });
-  $("brushCustom").value = brush;
-}
-function setBrush(col){
-  brush = col;
-  try{ localStorage.setItem(BRUSH_KEY, col); }catch(e){}
-  syncBrush();
-}
 function buildCalendar(){
   var wk = $("calWeek"); wk.textContent = "";
-  WEEKDAYS.forEach(function(w){ var s = document.createElement("span"); s.textContent = w; wk.appendChild(s); });
-  function fill(host, colors){
-    host.textContent = "";
-    colors.forEach(function(col){
-      var b = document.createElement("button");
-      b.className = "sw brushsw"; b.style.background = col; b.dataset.color = col;
-      b.setAttribute("aria-label", "Colour " + col); b.setAttribute("aria-pressed", "false");
-      b.addEventListener("click", function(){ setBrush(col); });
-      host.appendChild(b);
-    });
-  }
-  fill($("brushPastel"), PASTELS); fill($("brushDeep"), DEEP);
-  syncBrush();
+  WEEKDAYS.forEach(function(w){ wk.appendChild(mk("span", null, w)); });
 }
-$("brushCustom").addEventListener("input", function(e){ setBrush(e.target.value); });
 $("calPrev").addEventListener("click", function(){ shiftMonth(-1); });
 $("calNext").addEventListener("click", function(){ shiftMonth(1); });
 $("calTitle").addEventListener("click", function(){
   var n = new Date(); calView.y = n.getFullYear(); calView.m = n.getMonth(); renderCalendar();
 });
-document.addEventListener("visibilitychange", function(){ if (!document.hidden && state.mode === "cal") renderCalendar(); });
+
+// Roll over to the new day if the app was left open past midnight.
+var lastToday = todayKey();
+function rollDay(){
+  if (todayKey() === lastToday) return;
+  lastToday = todayKey();
+  renderCounters();
+  if (state.mode === "cal") renderCalendar();
+}
+document.addEventListener("visibilitychange", function(){ if (!document.hidden) rollDay(); });
+setInterval(rollDay, 30000);
 
 /* ---------- wiring ---------- */
 $("mTap").addEventListener("click", function(){ setMode("tap"); });
 $("mMulti").addEventListener("click", function(){ setMode("multi"); });
 $("mCal").addEventListener("click", function(){ setMode("cal"); });
 $("btnAdd").addEventListener("click", function(){ openCounterSheet(null); });
-$("multiSave").addEventListener("click", function(){ openSaveSheet("counters"); });
-$("tapSave").addEventListener("click", function(){ openSaveSheet("tap"); });
+$("btnSelect").addEventListener("click", function(){ setSelecting(true); });
+$("selCancel").addEventListener("click", function(){ setSelecting(false); });
+$("selAll").addEventListener("click", function(){
+  var all = state.counters.length && Object.keys(selected).length === state.counters.length;
+  selected = {};
+  if (!all) state.counters.forEach(function(c){ selected[c.id] = true; });
+  renderCounters(); updateSelectUI();
+});
+$("selDelete").addEventListener("click", function(){
+  var ids = Object.keys(selected), n = ids.length;
+  if (!n) return;
+  if (!window.confirm("Delete " + n + (n === 1 ? " task" : " tasks") + " and their history?")) return;
+  state.counters = state.counters.filter(function(c){ return !selected[c.id]; });
+  persist(); setSelecting(false);
+  toast(n === 1 ? "Task deleted" : n + " tasks deleted");
+});
+$("tapSave").addEventListener("click", function(){ openSaveSheet(); });
 $("tapMinus").addEventListener("click", function(){ tapBump(-1); });
 
 var tz = $("tapzone");
