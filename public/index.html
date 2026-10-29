@@ -222,8 +222,13 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .grip:hover{opacity:.9}
 .grip{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .grip svg{width:18px;height:18px;fill:currentColor}
-.row.dragging{position:relative;z-index:5;box-shadow:0 12px 32px rgba(0,0,0,.30);cursor:grabbing}
+.list{overflow-anchor:none}
+.list.dragging{user-select:none;-webkit-user-select:none}
+.list.dragging .row{will-change:transform}
+.list.dragging .row:not(.dragging){transition:transform .16s ease}
+.row.dragging{position:relative;z-index:5;box-shadow:0 12px 32px rgba(0,0,0,.30);cursor:grabbing;transition:none}
 .row.dragging .grip{cursor:grabbing}
+.grip{width:38px;height:52px;margin:-8px 0 -8px -10px}
 .pips{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
 .pip{width:10px;height:10px;border-radius:99px;border:1.5px solid currentColor;opacity:.55}
 .pip.on{background:currentColor;opacity:1}
@@ -256,6 +261,60 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .tallyrow .marks{justify-content:flex-start;max-width:none;min-height:24px;flex:1;min-width:0}
 .tallytxt{flex:none;font-size:13px;color:var(--muted);font-weight:650}
 .day:disabled{opacity:.4}
+
+.todaytop{align-items:center}
+.sortbtn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:650;color:var(--muted);
+  padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--card)}
+.sortbtn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sortbtn[aria-pressed="true"]{color:var(--accent-ink);background:var(--accent);border-color:var(--accent)}
+.grouphead{flex:none;display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:10px 4px 0;
+  font-size:13px;font-weight:700;color:var(--muted)}
+.grouphead:first-child{padding-top:0}
+.grouphead.pickable{cursor:pointer}
+.gname{font-size:14px;color:var(--ink)}
+.ico{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:21px;line-height:1;
+  background:rgba(255,255,255,.42)}
+
+.tagsug{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 14px}
+.tagchip{padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--paper);
+  font-size:13.5px;font-weight:650;color:var(--ink)}
+.iconrow{display:flex;align-items:center;gap:10px}
+.iconbtn{flex:none;width:48px;height:48px;border-radius:14px;border:1px solid var(--line);background:var(--paper);
+  font-size:26px;line-height:1;display:grid;place-items:center;color:var(--muted)}
+.iconsug{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px}
+.iconchip{min-width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--paper);
+  font-size:20px;padding:0 8px;line-height:1}
+.iconchip.txt{font-size:13px;font-weight:650;color:var(--muted)}
+.iconchip[aria-pressed="true"],.emo[aria-pressed="true"]{border-color:var(--ink)}
+.emojis{margin-top:10px}
+.emolabel{font-size:12px;font-weight:700;color:var(--muted);margin:8px 0 4px}
+.emogrid{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.emo{width:38px;height:38px;border-radius:10px;font-size:21px;line-height:1;display:grid;place-items:center;
+  border:1px solid transparent}
+.customicon{display:flex;align-items:center;gap:10px;margin-top:6px}
+.customicon span{font-size:13.5px;color:var(--muted);font-weight:600}
+.customicon input{width:80px;padding:8px 10px;border-radius:11px;border:1px solid var(--line);background:var(--paper);font-size:18px}
+
+.chips{position:relative}
+.chip.tagc{background:transparent;border-style:dashed}
+.chip.tagc[aria-pressed="true"]{background:var(--accent);border-style:solid}
+.cico{flex:none;font-size:15px;line-height:1}
+.legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:650}
+.legend i{flex:1;height:10px;border-radius:99px;border:1px solid var(--line)}
+
+.daysum{font-size:14px;color:var(--muted);font-weight:650;margin:-4px 0 4px}
+.daysec{font-size:12.5px;color:var(--muted);font-weight:700;margin:14px 0 7px}
+.dayrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border-radius:14px;
+  border:1px solid var(--line);border-left:6px solid var(--tc);background:var(--paper);margin-bottom:8px}
+.dayrow:disabled{opacity:.6}
+.dtick{flex:none;width:26px;height:26px;border-radius:99px;border:2px solid var(--line);display:grid;place-items:center;
+  font-size:13px;font-weight:800;color:var(--muted)}
+.dayrow.done .dtick{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.dico{flex:none;font-size:20px;line-height:1}
+.dmeta{flex:1;min-width:0;display:flex;flex-direction:column}
+.dname{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dtag{font-size:12.5px;color:var(--muted)}
+.dcount{flex:none;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
 
 .toast{position:fixed;left:50%;transform:translate(-50%,20px);bottom:calc(88px + env(safe-area-inset-bottom,0px));
   background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:999px;font-size:14.5px;font-weight:600;
@@ -306,9 +365,12 @@ button{background:none;border:0;padding:0;cursor:pointer}
 
   <section class="screen active" id="screenMulti">
     <div class="today" id="todayBar" hidden>
-      <div class="todaytop"><b id="todayDate"></b><span id="todayCount"></span></div>
+      <div class="todaytop"><b id="todayDate"></b>
+        <button class="sortbtn" id="btnSort" aria-pressed="false" hidden><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h5"/></svg><span id="sortLabel">Manual</span></button>
+        <span id="todayCount"></span></div>
       <div class="bar"><i id="todayFill"></i></div>
     </div>
+    <div class="chips" id="tagFilter" hidden></div>
     <div class="list" id="counterList"></div>
     <div class="footer" id="footNormal">
       <button class="round" id="btnAdd" aria-label="New task">
@@ -345,6 +407,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
         <div class="wk" id="calWeek"></div>
         <div class="grid" id="calGrid" style="margin-top:6px"></div>
       </div>
+      <div class="legend" id="calLegend" hidden><span>0%</span><i id="legendBar"></i><span>100%</span></div>
       <p class="calhint" id="calHint"></p>
     </div>
   </section>
@@ -355,7 +418,16 @@ button{background:none;border:0;padding:0;cursor:pointer}
 <div class="sheet" id="sheetCounter" role="dialog" aria-modal="true" aria-labelledby="sheetCounterTitle">
   <h2 id="sheetCounterTitle">New task</h2>
   <label class="field"><span>Name</span><input type="text" id="cName" autocomplete="off"></label>
+  <div class="field">
+    <span>Icon</span>
+    <div class="iconrow">
+      <button type="button" class="iconbtn" id="cIconBtn" aria-label="Choose an icon"></button>
+      <div class="iconsug" id="cIconSug"></div>
+    </div>
+    <div class="emojis" id="cEmojis" hidden></div>
+  </div>
   <label class="field"><span>Tag</span><input type="text" id="cTag" autocomplete="off"></label>
+  <div class="tagsug" id="cTagSug" hidden></div>
   <div class="field">
     <span>Times per day</span>
     <div class="freqrow">
@@ -386,6 +458,14 @@ button{background:none;border:0;padding:0;cursor:pointer}
     <button class="btn-quiet" id="cCancel">Cancel</button>
     <button class="btn-primary" id="cSave">Add task</button>
   </div>
+</div>
+
+<div class="sheet" id="sheetDay" role="dialog" aria-modal="true" aria-labelledby="dayTitle">
+  <h2 id="dayTitle"></h2>
+  <div class="daysum" id="daySummary"></div>
+  <div id="dayList"></div>
+  <p class="calhint" id="dayHint"></p>
+  <div class="linkrow"><button class="linkbtn" id="dayClose">Close</button><span></span></div>
 </div>
 
 <div class="sheet" id="sheetSave" role="dialog" aria-modal="true" aria-labelledby="sheetSaveTitle">
@@ -486,6 +566,7 @@ function adopt(d){
     var freq = clampFreq(c.freq);
     return { id: String(c.id || uid()), name: String(c.name || ""), tag: String(c.tag || ""),
       color: /^#[0-9a-fA-F]{3,8}$/.test(c.color || "") ? c.color : DEFAULT_COLOR,
+      icon: c.icon === undefined ? (suggestIcons(c.name)[0] || "") : cleanIcon(c.icon),
       freq: freq, done: cleanDone(c.done || c.days, freq), createdAt: c.createdAt || nowISO() };
   });
   if (Array.isArray(d.log)) state.log = d.log.map(function(e){
@@ -615,6 +696,137 @@ function startKey(c){
 }
 function applies(c, key){ return key >= startKey(c) || !!c.done[key]; }
 
+/* tags and icons */
+function tagKey(t){ return String(t || "").trim().toLowerCase(); }
+// Tasks grouped by tag, groups A to Z, untagged last. The first spelling seen names the group.
+function tagGroups(list){
+  var map = Object.create(null), keys = [];
+  list.forEach(function(c){
+    var k = tagKey(c.tag);
+    if (!map[k]){ map[k] = { key: k, label: String(c.tag || "").trim(), tasks: [] }; keys.push(k); }
+    map[k].tasks.push(c);
+  });
+  keys.sort(function(a, b){ if (!a) return 1; if (!b) return -1; return a.localeCompare(b); });
+  return keys.map(function(k){ return map[k]; });
+}
+function knownTags(){
+  return tagGroups(state.counters).filter(function(g){ return g.key; }).map(function(g){ return g.label; });
+}
+function firstGraphemes(str, n){
+  str = String(str || "");
+  try{
+    if (window.Intl && Intl.Segmenter){
+      var out = [], it = new Intl.Segmenter(undefined, { granularity:"grapheme" }).segment(str)[Symbol.iterator]();
+      for (var r = it.next(); !r.done && out.length < n; r = it.next()) out.push(r.value.segment);
+      return out.join("");
+    }
+  }catch(e){}
+  return Array.from(str).slice(0, n * 2).join("");
+}
+function cleanIcon(v){ return typeof v === "string" ? firstGraphemes(v.trim(), 1) : ""; }
+
+var ICON_RULES = [
+  ["water|drink|hydrat", "💧"],
+  ["read|book|novel", "📚 📖"],
+  ["study|learn|course|homework|revis|exam|class", "📖 🧠"],
+  ["gym|workout|exercise|lift|weight|train", "🏋️"],
+  ["run|jog|cardio", "🏃"],
+  ["walk|steps|stroll|hike", "🚶"],
+  ["yoga|stretch|meditat|mindful|breath", "🧘"],
+  ["cycl|bike", "🚴"],
+  ["swim", "🏊"],
+  ["sleep|bed|nap|wake", "😴 🛌"],
+  ["vitamin|pill|medic|tablet|supplement", "💊"],
+  ["teeth|brush|floss", "🦷"],
+  ["shower|bath|skin|face|cream|hair|groom", "🚿 🧴"],
+  ["cook|meal|dinner|lunch|breakfast|eat|kitchen", "🍳 🍽️"],
+  ["fruit|apple", "🍎"],
+  ["salad|veg", "🥗"],
+  ["coffee", "☕"],
+  ["tea\\b", "🍵"],
+  ["journal|diary|write|writing|blog|note", "✍️ 📝"],
+  ["code|coding|program|leetcode|debug", "💻"],
+  ["email|mail|inbox", "📧"],
+  ["call|phone|mom|dad|family|friend", "📞"],
+  ["budget|money|expense|saving|invest|bill|financ", "💰"],
+  ["clean|tidy|vacuum|sweep|dust|declutter", "🧹"],
+  ["laundry|clothes|wash", "🧺"],
+  ["dish", "🍽️"],
+  ["plant|garden", "🌱"],
+  ["hamster", "🐹"],
+  ["dog|puppy", "🐶"],
+  ["cat\\b|kitten", "🐱"],
+  ["guitar", "🎸"],
+  ["piano|music|sing|practi[cs]e|instrument", "🎹"],
+  ["draw|paint|sketch|art\\b", "🎨"],
+  ["game|gaming", "🎮"],
+  ["photo|camera", "📷"],
+  ["sun|outside|outdoor|fresh air", "☀️"],
+  ["pray|gratitude|thank", "🙏"],
+  ["plan|schedule|calendar|review|todo", "📅"],
+  ["doctor|checkup|health|weigh|blood", "🩺"],
+  ["shop|grocer", "🛒"]
+].map(function(r){ return { re: new RegExp("\\b(?:" + r[0] + ")", "i"), icons: r[1].split(" ") }; });
+var EMOJI_GROUPS = [
+  ["Health", "💧 🏃 🚶 🏋️ 🧘 🚴 🏊 💊 🦷 😴 🛌 🚿 🧴 🩺 ❤️"],
+  ["Mind", "📚 📖 ✍️ 📝 🧠 🎯 💡 🎧 🙏 🔬 📅"],
+  ["Work", "💻 📧 📞 💼 📊 💰 🧾"],
+  ["Home", "🧹 🧺 🍽️ 🛒 🌱 🐹 🐶 🐱 🔧"],
+  ["Food", "🍳 🥣 🍎 🥗 ☕ 🍵 🥦 🍞"],
+  ["Fun", "🎸 🎹 🎨 🎮 📷 🎬 ☀️ 🌙 ✈️ ⭐ 🔥 ✅"]
+];
+function suggestIcons(name){
+  var n = String(name || ""), out = [];
+  if (!n.trim()) return out;
+  ICON_RULES.forEach(function(r){
+    if (r.re.test(n)) r.icons.forEach(function(e){ if (out.indexOf(e) < 0) out.push(e); });
+  });
+  return out.slice(0, 5);
+}
+
+/* sort mode: manual order, or grouped by tag (a view setting kept on this device) */
+var sortMode = "manual";
+try{ if (localStorage.getItem(KEY + ".sort") === "tag") sortMode = "tag"; }catch(e){}
+var dragging = false, pendingRender = false;
+var filterTag = "";   // "" shows every task; otherwise only tasks with this tag (view only, not saved)
+function visibleTasks(){
+  if (!filterTag) return state.counters;
+  var v = state.counters.filter(function(c){ return tagKey(c.tag) === filterTag; });
+  if (v.length) return v;
+  filterTag = "";
+  return state.counters;
+}
+function renderTagFilter(){
+  var host = $("tagFilter"), groups = tagGroups(state.counters).filter(function(g){ return g.key; });
+  visibleTasks();
+  host.hidden = !groups.length;
+  host.textContent = "";
+  if (!groups.length) return;
+  function chip(key, label){
+    var b = mk("button", "chip" + (key ? " tagc" : ""), label);
+    b.setAttribute("aria-pressed", key === filterTag ? "true" : "false");
+    b.addEventListener("click", function(){ filterTag = key; renderCounters(); });
+    host.appendChild(b);
+  }
+  chip("", "All");
+  groups.forEach(function(g){ chip(g.key, "#" + g.label); });
+}
+
+function buildGroupHead(g){
+  var t = todayKey(), done = g.tasks.filter(function(c){ return doneOn(c, t) >= c.freq; }).length;
+  var h = mk("div", "grouphead" + (selecting ? " pickable" : ""));
+  h.dataset.group = g.key;
+  h.appendChild(mk("span", "gname", g.label ? "#" + g.label : "No tag"));
+  h.appendChild(mk("span", "gcount", done + " of " + g.tasks.length + " done"));
+  if (selecting) h.addEventListener("click", function(){ toggleGroup(g); });
+  return h;
+}
+function toggleGroup(g){
+  var all = g.tasks.every(function(c){ return selected[c.id]; });
+  g.tasks.forEach(function(c){ if (all) delete selected[c.id]; else selected[c.id] = true; });
+  renderCounters(); updateSelectUI();
+}
+
 function buildRow(c){
   var n = doneOn(c, todayKey()), full = n >= c.freq;
   var row = mk("div", "row" + (full ? " complete" : "") + (selecting ? " selecting" : "") + (selected[c.id] ? " picked" : ""));
@@ -628,15 +840,21 @@ function buildRow(c){
     box.innerHTML = SVG_CHECK;
     row.appendChild(box);
     row.addEventListener("click", function(){ toggleSelect(c.id); });
-  } else {
+  } else if (sortMode === "manual" && !filterTag){
     var grip = mk("button", "grip");
     grip.setAttribute("aria-label", "Reorder. Drag, or use the up and down arrow keys.");
     grip.innerHTML = SVG_GRIP;
     grip.addEventListener("pointerdown", function(e){ startDrag(e, row); });
+    grip.addEventListener("contextmenu", function(e){ e.preventDefault(); });
     grip.addEventListener("keydown", function(e){
       if (e.key === "ArrowUp" || e.key === "ArrowDown"){ e.preventDefault(); moveTask(c.id, e.key === "ArrowUp" ? -1 : 1); }
     });
     row.appendChild(grip);
+  }
+  if (c.icon){
+    var ico = mk("span", "ico", c.icon);
+    ico.setAttribute("aria-hidden", "true");
+    row.appendChild(ico);
   }
 
   var meta = mk("button", "meta");
@@ -674,6 +892,8 @@ function buildRow(c){
   return row;
 }
 function refreshRow(id){
+  if (dragging){ pendingRender = true; return; }
+  if (sortMode === "tag"){ renderCounters(); return; }   // group counts change too
   var c = findTask(id), rows = $("counterList").children;
   for (var i = 0; i < rows.length; i++){
     if (rows[i].dataset.id === id && c){ rows[i].replaceWith(buildRow(c)); break; }
@@ -681,11 +901,11 @@ function refreshRow(id){
   renderSummary();
 }
 function renderSummary(){
-  var total = state.counters.length;
-  $("todayBar").hidden = !total;
+  var vis = visibleTasks(), total = vis.length;
+  $("todayBar").hidden = !state.counters.length;
   if (!total) return;
   var t = todayKey(), done = 0, part = 0;
-  state.counters.forEach(function(c){
+  vis.forEach(function(c){
     var n = doneOn(c, t);
     if (n >= c.freq) done++;
     part += Math.min(n, c.freq) / c.freq;
@@ -694,10 +914,17 @@ function renderSummary(){
   $("todayCount").textContent = done === total ? "All done" : done + " of " + total + " done";
   $("todayFill").style.width = Math.round(part / total * 100) + "%";
 }
+function renderSortBtn(){
+  var b = $("btnSort");
+  b.hidden = !state.counters.length;
+  b.setAttribute("aria-pressed", sortMode === "tag" ? "true" : "false");
+  $("sortLabel").textContent = sortMode === "tag" ? "By tag" : "Manual";
+}
 function renderCounters(){
+  if (dragging){ pendingRender = true; return; }
   var list = $("counterList"), keep = list.scrollTop;
   list.textContent = "";
-  renderSummary();
+  renderSummary(); renderSortBtn(); renderTagFilter();
   $("btnSelect").hidden = !state.counters.length;
   if (!state.counters.length){
     var e = mk("div", "empty");
@@ -707,7 +934,14 @@ function renderCounters(){
     b.addEventListener("click", function(){ openCounterSheet(null); });
     e.appendChild(b); list.appendChild(e); return;
   }
-  state.counters.forEach(function(c){ list.appendChild(buildRow(c)); });
+  if (sortMode === "tag"){
+    tagGroups(visibleTasks()).forEach(function(g){
+      list.appendChild(buildGroupHead(g));
+      g.tasks.forEach(function(c){ list.appendChild(buildRow(c)); });
+    });
+  } else {
+    visibleTasks().forEach(function(c){ list.appendChild(buildRow(c)); });
+  }
   list.scrollTop = keep;
 }
 
@@ -751,59 +985,81 @@ function moveTask(id, delta){
     if (rows[r].dataset.id === id){ var g = rows[r].querySelector(".grip"); if (g) g.focus(); }
   }
 }
+// Dragging measures every row once, then only moves rows with transforms: the dragged row follows
+// the pointer and the rows it passes slide out of the way. Nothing is re-laid-out per frame, no rows
+// are moved in the document until the drop, and the list's own scrolling is held off while it runs.
 function startDrag(e, row){
-  if (e.button != null && e.button !== 0) return;
+  if (dragging || (e.button != null && e.button !== 0)) return;
+  var list = $("counterList"), grip = e.currentTarget, rows = [], k;
+  for (k = 0; k < list.children.length; k++) if (list.children[k].dataset.id) rows.push(list.children[k]);
+  var from = rows.indexOf(row);
+  if (from < 0 || rows.length < 2) return;
   e.preventDefault();
-  var list = $("counterList"), grip = e.currentTarget;
+  dragging = true;
   try{ grip.setPointerCapture(e.pointerId); }catch(err){}
-  var startY = e.clientY, lastY = e.clientY, raf = 0;
-  var gap = parseFloat(getComputedStyle(list).rowGap) || 10;
-  row.classList.add("dragging");
 
-  // Swap with a neighbour whenever the dragged row's centre passes that neighbour's centre,
-  // and shift the start point by the same distance so the row stays under the pointer.
-  function place(){
-    for (var guard = 0; guard < 60; guard++){
-      row.style.transform = "translateY(" + (lastY - startY) + "px)";
-      var r = row.getBoundingClientRect(), mid = r.top + r.height / 2;
-      var next = row.nextElementSibling, prev = row.previousElementSibling, moved = false;
-      if (next){
-        var nr = next.getBoundingClientRect();
-        if (mid > nr.top + nr.height / 2){ list.insertBefore(next, row); startY += nr.height + gap; moved = true; }
-      }
-      if (!moved && prev){
-        var pr = prev.getBoundingClientRect();
-        if (mid < pr.top + pr.height / 2){ list.insertBefore(row, prev); startY -= pr.height + gap; moved = true; }
-      }
-      if (!moved) return;
+  var lr = list.getBoundingClientRect(), s0 = list.scrollTop;
+  var gap = parseFloat(getComputedStyle(list).rowGap) || 10;
+  var tops = rows.map(function(r){ return r.getBoundingClientRect().top - lr.top + s0; });
+  var hs = rows.map(function(r){ return r.offsetHeight; });
+  var mids = tops.map(function(t, i){ return t + hs[i] / 2; });
+  var step = hs[from] + gap, last = rows.length - 1;
+  var minDy = tops[0] - tops[from], maxDy = tops[last] + hs[last] - hs[from] - tops[from];
+  var y0 = e.clientY, y = y0, to = from, raf = 0;
+  var shifts = rows.map(function(){ return 0; });
+  list.classList.add("dragging"); row.classList.add("dragging");
+
+  function frame(){
+    var edge = 64, v = 0;
+    if (y < lr.top + edge) v = -Math.ceil((lr.top + edge - y) / 5);
+    else if (y > lr.bottom - edge) v = Math.ceil((y - (lr.bottom - edge)) / 5);
+    if (v) list.scrollTop += v;
+    var dy = Math.max(minDy, Math.min(maxDy, (y - y0) + (list.scrollTop - s0)));
+    var c = tops[from] + hs[from] / 2 + dy, cnt = 0, i;
+    for (i = 0; i < rows.length; i++) if (i !== from && mids[i] < c) cnt++;
+    to = dy <= minDy ? 0 : (dy >= maxDy ? last : cnt);   // taller rows must still reach the ends
+    row.style.transform = "translate3d(0," + dy + "px,0) scale(1.02)";
+    for (i = 0; i < rows.length; i++){
+      if (i === from) continue;
+      var p = i < from ? i : i - 1, sh = 0;
+      if (i > from && p < to) sh = -step;
+      else if (i < from && p >= to) sh = step;
+      if (sh !== shifts[i]){ shifts[i] = sh; rows[i].style.transform = sh ? "translate3d(0," + sh + "px,0)" : ""; }
     }
+    raf = requestAnimationFrame(frame);
   }
-  function auto(){
-    var lr = list.getBoundingClientRect(), edge = 56, v = 0;
-    if (lastY < lr.top + edge) v = -Math.ceil((lr.top + edge - lastY) / 6);
-    else if (lastY > lr.bottom - edge) v = Math.ceil((lastY - (lr.bottom - edge)) / 6);
-    if (v){
-      var before = list.scrollTop;
-      list.scrollTop += v;
-      var moved = list.scrollTop - before;
-      if (moved){ startY -= moved; place(); }
-    }
-    raf = requestAnimationFrame(auto);
-  }
-  function onMove(ev){ lastY = ev.clientY; place(); }
-  function end(){
+  function onMove(ev){ y = ev.clientY; }
+  function block(ev){ ev.preventDefault(); }
+  function up(){ finish(false); }
+  function cancel(){ finish(true); }
+  function finish(cancelled){
     cancelAnimationFrame(raf);
     grip.removeEventListener("pointermove", onMove);
-    grip.removeEventListener("pointerup", end);
-    grip.removeEventListener("pointercancel", end);
-    row.classList.remove("dragging");
-    row.style.transform = "";
-    commitOrder();
+    grip.removeEventListener("pointerup", up);
+    grip.removeEventListener("pointercancel", cancel);
+    document.removeEventListener("touchmove", block);
+    var order = [], i;
+    for (i = 0; i < rows.length; i++) if (i !== from) order.push(i);
+    order.splice(cancelled ? from : to, 0, from);
+    // glide into the final slots, then commit the new order in one go
+    var t = tops[0], off = [];
+    order.forEach(function(idx){ off[idx] = t - tops[idx]; t += hs[idx] + gap; });
+    rows.forEach(function(r, idx){ r.style.transform = off[idx] ? "translate3d(0," + off[idx] + "px,0)" : ""; });
+    row.style.transition = "transform .14s ease";
+    setTimeout(function(){
+      rows.forEach(function(r){ r.style.transform = ""; r.style.transition = ""; r.classList.remove("dragging"); });
+      list.classList.remove("dragging");
+      order.forEach(function(idx){ list.appendChild(rows[idx]); });
+      dragging = false;
+      if (!cancelled) commitOrder();
+      if (pendingRender){ pendingRender = false; renderCounters(); }
+    }, 160);
   }
   grip.addEventListener("pointermove", onMove);
-  grip.addEventListener("pointerup", end);
-  grip.addEventListener("pointercancel", end);
-  raf = requestAnimationFrame(auto);
+  grip.addEventListener("pointerup", up);
+  grip.addEventListener("pointercancel", cancel);
+  document.addEventListener("touchmove", block, { passive: false });
+  raf = requestAnimationFrame(frame);
 }
 
 /* select and delete */
@@ -960,6 +1216,7 @@ document.addEventListener("keydown", function(e){
 });
 
 var editingId = null, pickedColor = DEFAULT_COLOR, pickedFreq = 1;
+var iconMode = "auto", pickedIcon = "";
 function buildSwatches(){
   function fill(host, colors){
     host.textContent = "";
@@ -987,6 +1244,79 @@ function syncFreq(){
 }
 $("cFreqMinus").addEventListener("click", function(){ if (pickedFreq > 1){ pickedFreq--; syncFreq(); } });
 $("cFreqPlus").addEventListener("click", function(){ if (pickedFreq < 50){ pickedFreq++; syncFreq(); } });
+
+/* icon: picked from the name until you choose one yourself */
+function currentIcon(){
+  if (iconMode === "manual") return pickedIcon;
+  if (iconMode === "none") return "";
+  return suggestIcons($("cName").value)[0] || "";
+}
+function renderIconUI(){
+  var shown = currentIcon(), host = $("cIconSug");
+  $("cIconBtn").textContent = shown || "+";
+  host.textContent = "";
+  suggestIcons($("cName").value).forEach(function(e){
+    var b = mk("button", "iconchip", e);
+    b.type = "button";
+    b.setAttribute("aria-pressed", shown === e ? "true" : "false");
+    b.addEventListener("click", function(){ iconMode = "manual"; pickedIcon = e; renderIconUI(); });
+    host.appendChild(b);
+  });
+  if (shown){
+    var none = mk("button", "iconchip txt", "None");
+    none.type = "button";
+    none.addEventListener("click", function(){ iconMode = "none"; renderIconUI(); });
+    host.appendChild(none);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("#cEmojis .emo"), function(b){
+    b.setAttribute("aria-pressed", b.textContent === shown ? "true" : "false");
+  });
+}
+function buildEmojis(){
+  var host = $("cEmojis"); host.textContent = "";
+  EMOJI_GROUPS.forEach(function(g){
+    host.appendChild(mk("div", "emolabel", g[0]));
+    var grid = mk("div", "emogrid");
+    g[1].split(" ").forEach(function(e){
+      var b = mk("button", "emo", e);
+      b.type = "button";
+      b.addEventListener("click", function(){ iconMode = "manual"; pickedIcon = e; renderIconUI(); });
+      grid.appendChild(b);
+    });
+    host.appendChild(grid);
+  });
+  var lab = mk("label", "customicon");
+  lab.appendChild(mk("span", null, "Or type your own"));
+  var inp = mk("input");
+  inp.type = "text"; inp.id = "cEmojiCustom"; inp.autocomplete = "off";
+  inp.setAttribute("aria-label", "Type an emoji");
+  inp.addEventListener("input", function(){
+    var v = firstGraphemes(inp.value.trim(), 1);
+    if (v){ iconMode = "manual"; pickedIcon = v; renderIconUI(); }
+  });
+  lab.appendChild(inp); host.appendChild(lab);
+}
+$("cIconBtn").addEventListener("click", function(){ $("cEmojis").hidden = !$("cEmojis").hidden; });
+$("cName").addEventListener("input", renderIconUI);
+
+/* tag suggestions: tags already in use, narrowed as you type */
+function renderTagSug(){
+  var host = $("cTagSug"), typed = tagKey($("cTag").value);
+  host.textContent = "";
+  var tags = knownTags().filter(function(t){
+    var k = tagKey(t);
+    return k !== typed && (!typed || k.indexOf(typed) >= 0);
+  }).slice(0, 12);
+  host.hidden = !tags.length;
+  tags.forEach(function(t){
+    var b = mk("button", "tagchip", "#" + t);
+    b.type = "button";
+    b.addEventListener("click", function(){ $("cTag").value = t; renderTagSug(); });
+    host.appendChild(b);
+  });
+}
+$("cTag").addEventListener("input", renderTagSug);
+
 function openCounterSheet(id){
   editingId = id;
   var c = id ? findTask(id) : null;
@@ -996,23 +1326,31 @@ function openCounterSheet(id){
   $("cTag").value = c ? c.tag : "";
   pickedColor = c ? c.color : PASTELS[Math.floor(Math.random() * 8)];
   pickedFreq = c ? c.freq : 1;
-  syncSwatches(); syncFreq();
+  iconMode = c ? (c.icon ? "manual" : "none") : "auto";
+  pickedIcon = c ? c.icon : "";
+  $("cEmojis").hidden = true;
+  $("cEmojiCustom").value = "";
+  syncSwatches(); syncFreq(); renderIconUI(); renderTagSug();
   $("cEditExtras").hidden = !c;
   openSheet($("sheetCounter"));
 }
 $("cCustom").addEventListener("input", function(e){ pickedColor = e.target.value; syncSwatches(); });
 $("cCancel").addEventListener("click", closeSheet);
 $("cSave").addEventListener("click", function(){
-  var name = $("cName").value.trim(), tag = $("cTag").value.trim();
+  var name = $("cName").value.trim(), tag = $("cTag").value.trim(), icon = currentIcon();
+  if (tag){   // reuse the spelling already in use for that tag
+    var known = knownTags().filter(function(t){ return tagKey(t) === tagKey(tag); })[0];
+    if (known) tag = known;
+  }
   if (editingId){
     var c = findTask(editingId);
     if (c){
-      c.name = name; c.tag = tag; c.color = pickedColor; c.freq = pickedFreq;
+      c.name = name; c.tag = tag; c.color = pickedColor; c.freq = pickedFreq; c.icon = icon;
       var t = todayKey();
       if (c.done[t] > c.freq) c.done[t] = c.freq;
     }
   } else {
-    state.counters.push({ id: uid(), name: name, tag: tag, color: pickedColor, freq: pickedFreq, done: {}, createdAt: nowISO() });
+    state.counters.push({ id: uid(), name: name, tag: tag, icon: icon, color: pickedColor, freq: pickedFreq, done: {}, createdAt: nowISO() });
   }
   persist(); renderCounters(); closeSheet();
 });
@@ -1204,24 +1542,52 @@ window.addEventListener("focus", refreshFromServer);
 document.addEventListener("visibilitychange", refreshFromServer);
 
 /* ---------- calendar ---------- */
-var calSel = "all";
+var calSel = "all";   // "all", "tag:<key>" or a task id
 var calView = (function(){ var n = new Date(); return { y:n.getFullYear(), m:n.getMonth() }; })();
 var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 var WEEKDAYS = ["S","M","T","W","T","F","S"];
+var dayCtx = null;
 
 function calTasks(){
-  if (calSel !== "all"){
+  if (calSel === "all") return state.counters;
+  if (calSel.indexOf("tag:") === 0){
+    var k = calSel.slice(4);
+    var inTag = state.counters.filter(function(c){ return tagKey(c.tag) === k; });
+    if (inTag.length) return inTag;
+  } else {
     var c = findTask(calSel);
     if (c) return [c];
-    calSel = "all";
   }
+  calSel = "all";
   return state.counters;
+}
+function calSingle(){
+  calTasks();
+  return (calSel !== "all" && calSel.indexOf("tag:") !== 0) ? findTask(calSel) : null;
 }
 function accentHex(){
   var v = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
   return /^#[0-9a-fA-F]{6}$/.test(v) ? v : "#12594F";
 }
-// How done a day is across the given tasks: every task that applies has to hit its daily count.
+function cardHex(){
+  var v = getComputedStyle(document.documentElement).getPropertyValue("--card").trim();
+  return /^#[0-9a-fA-F]{6}$/.test(v) ? v : "#FFFFFF";
+}
+function blend(top, under, a){
+  var A = rgbOf(top), B = rgbOf(under);
+  return "#" + [0, 1, 2].map(function(i){
+    var v = Math.round(B[i] + (A[i] - B[i]) * a);
+    return (v < 16 ? "0" : "") + v.toString(16);
+  }).join("");
+}
+// A day's colour deepens with how much of it is done, from a faint wash to the full colour.
+function shade(base, level){
+  if (level <= 0) return null;
+  if (level >= 1) return { bg: base, ink: inkOn(base), full: true };
+  var bg = blend(base, cardHex(), 0.14 + 0.72 * level);
+  return { bg: bg, ink: inkOn(bg), full: false };
+}
+// How done a day is across the given tasks. A task counts on a day from the day it was made.
 function dayInfo(list, key){
   var applicable = 0, complete = 0, partial = 0;
   list.forEach(function(c){
@@ -1232,9 +1598,11 @@ function dayInfo(list, key){
     else if (n > 0) partial += n / c.freq;
   });
   return { applicable: applicable, complete: complete,
-    full: applicable > 0 && complete === applicable,
-    frac: applicable ? (complete + partial) / applicable : 0 };
+    ratio: applicable ? complete / applicable : 0,
+    frac: applicable ? (complete + partial) / applicable : 0,
+    full: applicable > 0 && complete === applicable };
 }
+function dayLevel(info){ return info.applicable > 1 ? info.ratio : info.frac; }
 // Current streak counts back from today. If today is not finished yet, it counts back from
 // yesterday, so the streak does not read zero until a day is actually missed.
 function calStats(list){
@@ -1256,21 +1624,33 @@ function calStats(list){
   return { cur: cur, best: best, total: nums.length, checks: checks };
 }
 
+// Chips run in tag order: All tasks, then each tag followed by its tasks.
 function renderChips(){
-  var host = $("calTasks"); host.textContent = "";
-  function chip(id, label, color){
-    var b = mk("button", "chip");
+  var host = $("calTasks"), keep = host.scrollLeft;
+  host.textContent = "";
+  function chip(id, label, color, icon, isTag){
+    var b = mk("button", "chip" + (isTag ? " tagc" : ""));
     b.setAttribute("aria-pressed", id === calSel ? "true" : "false");
-    if (color){ var dot = mk("i"); dot.style.background = color; b.appendChild(dot); }
+    if (icon){ b.appendChild(mk("span", "cico", icon)); }
+    else if (color){ var dot = mk("i"); dot.style.background = color; b.appendChild(dot); }
     b.appendChild(mk("span", null, label));
     b.addEventListener("click", function(){ calSel = id; renderCalendar(); });
     host.appendChild(b);
   }
-  chip("all", "All tasks", null);
-  state.counters.forEach(function(c){ chip(c.id, c.name || "Untitled", c.color); });
+  chip("all", "All tasks", null, "", false);
+  tagGroups(state.counters).forEach(function(g){
+    if (g.key) chip("tag:" + g.key, "#" + g.label, null, "", true);
+    g.tasks.forEach(function(c){ chip(c.id, c.name || "Untitled", c.color, c.icon, false); });
+  });
+  host.scrollLeft = keep;
+  var a = host.querySelector('[aria-pressed="true"]');
+  if (a){
+    if (a.offsetLeft < host.scrollLeft) host.scrollLeft = a.offsetLeft - 8;
+    else if (a.offsetLeft + a.offsetWidth > host.scrollLeft + host.clientWidth) host.scrollLeft = a.offsetLeft + a.offsetWidth - host.clientWidth + 8;
+  }
 }
 function renderCalendar(){
-  var list = calTasks();
+  var list = calTasks(), single = calSingle();
   renderChips();
   var st = calStats(list);
   $("stCur").textContent = st.cur;
@@ -1280,8 +1660,7 @@ function renderCalendar(){
   $("calChecks").textContent = st.checks + (st.checks === 1 ? " check-off" : " check-offs");
   $("calTitle").textContent = MONTHS[calView.m] + " " + calView.y;
 
-  var one = calSel !== "all" ? list[0] : null;
-  var base = one ? calColor(one.color) : accentHex();
+  var base = single ? calColor(single.color) : accentHex();
   var grid = $("calGrid"); grid.textContent = "";
   var first = new Date(calView.y, calView.m, 1).getDay();
   var count = new Date(calView.y, calView.m + 1, 0).getDate();
@@ -1290,36 +1669,86 @@ function renderCalendar(){
   for (var d = 1; d <= count; d++){
     (function(d){
       var key = dayKey(calView.y, calView.m, d), info = dayInfo(list, key);
-      var cell = mk("button", "day" + (info.full ? " painted" : "") + (key === today ? " today" : ""), String(d));
-      var label = MONTHS[calView.m] + " " + d;
-      if (info.full) label += ", complete";
-      else if (info.frac > 0) label += ", partly done";
-      cell.setAttribute("aria-label", label);
-      if (info.full){ cell.style.background = base; cell.style.color = inkOn(base); }
-      else if (info.frac > 0){ cell.style.background = tint(base, 0.2 + 0.55 * info.frac); }
+      var level = dayLevel(info), sh = shade(base, level);
+      var cell = mk("button", "day" + (sh && sh.full ? " painted" : "") + (key === today ? " today" : ""), String(d));
+      cell.setAttribute("aria-label", MONTHS[calView.m] + " " + d + (level > 0 ? ", " + Math.round(level * 100) + " percent done" : ""));
+      if (sh){ cell.style.background = sh.bg; cell.style.color = sh.ink; }
       if (key > today || !list.length) cell.disabled = true;
       cell.addEventListener("click", function(){ dayTap(key, list); });
       grid.appendChild(cell);
     })(d);
   }
+  var showLegend = list.length > 0 && (!single || single.freq > 1);
+  $("calLegend").hidden = !showLegend;
+  if (showLegend) $("legendBar").style.background = "linear-gradient(90deg," + shade(base, 0.01).bg + "," + base + ")";
   $("calHint").textContent = !state.counters.length
     ? "No tasks yet. Add some on the Today tab and they will show up here."
-    : (one
-      ? "Tap a day to add a check-off. After the last one it clears. Solid days are complete, paler days are partly done."
-      : "Every task has to be done for a day to count. Pick a task above for its own streaks, or to fix a missed day.");
+    : (single
+      ? (single.freq > 1
+        ? "Tap a day to add a check-off. After the last one it clears. Paler days are partly done."
+        : "Tap a day to mark it done, tap again to clear it.")
+      : "A day gets deeper the more of its tasks are done. Tap a day to see which ones.");
+}
+
+/* day detail: which tasks were done on a day, and a way to fix it */
+function cycleDay(c, key){
+  var n = doneOn(c, key) + 1;
+  if (n > c.freq) n = 0;
+  if (n === 0) delete c.done[key]; else c.done[key] = n;
+  tick(); persist(); renderDay(); renderCalendar();
+}
+function dayRow(c, key){
+  var n = doneOn(c, key), full = n >= c.freq;
+  var r = mk("button", "dayrow" + (full ? " done" : ""));
+  r.type = "button";
+  r.style.setProperty("--tc", c.color);
+  r.appendChild(mk("span", "dtick", full ? "✓" : (n ? String(n) : "")));
+  if (c.icon) r.appendChild(mk("span", "dico", c.icon));
+  var m = mk("span", "dmeta");
+  m.appendChild(mk("span", "dname", c.name || "Untitled"));
+  if (c.tag) m.appendChild(mk("span", "dtag", "#" + c.tag));
+  r.appendChild(m);
+  r.appendChild(mk("span", "dcount", c.freq > 1 ? n + "/" + c.freq : ""));
+  if (key > todayKey()) r.disabled = true;
+  else r.addEventListener("click", function(){ cycleDay(c, key); });
+  return r;
+}
+function renderDay(){
+  var key = dayCtx.key, list = dayCtx.list, p = key.split("-");
+  var d = new Date(+p[0], +p[1] - 1, +p[2]);
+  $("dayTitle").textContent = d.toLocaleDateString(undefined, { weekday:"long", day:"numeric", month:"long" });
+  var info = dayInfo(list, key);
+  $("daySummary").textContent = !info.applicable ? "No tasks on this day."
+    : (info.applicable > 1 ? info.complete + " of " + info.applicable + " tasks done · " + Math.round(info.ratio * 100) + "%"
+      : (info.complete ? "Done" : "Not done"));
+  var host = $("dayList"); host.textContent = "";
+  var here = list.filter(function(c){ return applies(c, key); });
+  var groups = [
+    ["Done", here.filter(function(c){ return doneOn(c, key) >= c.freq; })],
+    ["Partly done", here.filter(function(c){ var n = doneOn(c, key); return n > 0 && n < c.freq; })],
+    ["Not done", here.filter(function(c){ return doneOn(c, key) === 0; })]
+  ];
+  groups.forEach(function(g){
+    if (!g[1].length) return;
+    host.appendChild(mk("div", "daysec", g[0] + " · " + g[1].length));
+    g[1].forEach(function(c){ host.appendChild(dayRow(c, key)); });
+  });
+  $("dayHint").textContent = key > todayKey() || !here.length ? "" : "Tap a task to change it for this day.";
 }
 function dayTap(key, list){
-  if (calSel !== "all" && list.length === 1){
-    var c = list[0], n = doneOn(c, key) + 1;
-    if (n > c.freq) n = 0;
-    if (n === 0) delete c.done[key]; else c.done[key] = n;
+  var single = calSingle();
+  if (single){
+    var n = doneOn(single, key) + 1;
+    if (n > single.freq) n = 0;
+    if (n === 0) delete single.done[key]; else single.done[key] = n;
     tick(); persist(); renderCalendar();
     return;
   }
-  var info = dayInfo(list, key), p = key.split("-");
-  var when = new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString(undefined, { weekday:"short", day:"numeric", month:"short" });
-  toast(when + " · " + (info.applicable ? info.complete + " of " + info.applicable + " tasks done" : "no tasks yet"));
+  dayCtx = { key: key, list: list };
+  renderDay();
+  openSheet($("sheetDay"));
 }
+$("dayClose").addEventListener("click", closeSheet);
 function shiftMonth(delta){
   var d = new Date(calView.y, calView.m + delta, 1);
   calView.y = d.getFullYear(); calView.m = d.getMonth();
@@ -1352,6 +1781,12 @@ $("mMulti").addEventListener("click", function(){ setMode("multi"); });
 $("mCal").addEventListener("click", function(){ setMode("cal"); });
 $("btnAdd").addEventListener("click", function(){ openCounterSheet(null); });
 $("btnSelect").addEventListener("click", function(){ setSelecting(true); });
+$("btnSort").addEventListener("click", function(){
+  sortMode = sortMode === "tag" ? "manual" : "tag";
+  try{ localStorage.setItem(KEY + ".sort", sortMode); }catch(e){}
+  renderCounters();
+  toast(sortMode === "tag" ? "Grouped by tag. Switch back to Manual to drag." : "Manual order. Drag to reorder.");
+});
 $("selCancel").addEventListener("click", function(){ setSelecting(false); });
 $("selAll").addEventListener("click", function(){
   var all = state.counters.length && Object.keys(selected).length === state.counters.length;
@@ -1426,6 +1861,7 @@ if ("serviceWorker" in navigator){
 load();
 buildSwatches();
 buildCalendar();
+buildEmojis();
 applyMode(state.mode);
 if (state.mode !== "multi") pushLayer("tab", function(){ applyMode("multi", "back"); });
 renderTap();
