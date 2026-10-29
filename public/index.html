@@ -41,6 +41,7 @@
 }
 *,*::before,*::after{box-sizing:inherit}
 html,body{height:100%}
+html{overscroll-behavior:none}
 body{
   margin:0; background:var(--paper); color:var(--ink);
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -52,7 +53,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
 [hidden]{display:none !important}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
-#app{height:100%;display:flex;flex-direction:column;max-width:760px;margin:0 auto;width:100%}
+#app{height:100%;display:flex;flex-direction:column;max-width:760px;margin:0 auto;width:100%;overflow-x:clip}
 .topbar{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
 .switch{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
 .switch button{padding:7px 16px;border-radius:999px;font-size:14.5px;font-weight:600;color:var(--muted);white-space:nowrap}
@@ -69,6 +70,12 @@ button{background:none;border:0;padding:0;cursor:pointer}
 
 .screen{flex:1;min-height:0;display:none;flex-direction:column}
 .screen.active{display:flex}
+@media (prefers-reduced-motion: no-preference){
+  .screen.slide-fwd{animation:slideFwd .22s ease-out}
+  .screen.slide-back{animation:slideBack .22s ease-out}
+}
+@keyframes slideFwd{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes slideBack{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
 
 .labelrow{display:flex;justify-content:center;align-items:center;gap:2px;padding:2px 14px 0}
 .resetbtn{font-size:14px;opacity:.75}
@@ -125,7 +132,7 @@ button{background:none;border:0;padding:0;cursor:pointer}
 .scrim.open{opacity:1;pointer-events:auto}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);
   border-radius:22px 22px 0 0;border-top:1px solid var(--line);
-  padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));
+  padding:0 18px calc(18px + env(safe-area-inset-bottom,0px));
   visibility:hidden;transform:translateY(110%);
   transition:transform .22s cubic-bezier(.2,.8,.3,1), visibility 0s linear .22s;
   max-height:88%;overflow-y:auto;max-width:760px;margin:0 auto}
@@ -135,17 +142,24 @@ button{background:none;border:0;padding:0;cursor:pointer}
 @media (min-width:720px){.sheet{border-radius:22px;bottom:24px;left:24px;right:24px;border:1px solid var(--line);
   transform:translateY(calc(110% + 24px))}
   .sheet.open{transform:translateY(0)}}
-.sheet h2{margin:0 0 14px;font-size:18.5px;font-weight:700}
+.sheet h2{margin:0;font-size:18.5px;font-weight:700}
+.sheethead{position:sticky;top:0;z-index:3;background:var(--card);display:flex;align-items:center;
+  justify-content:space-between;gap:12px;padding:14px 0 12px}
+.sheetx{flex:none;width:36px;height:36px;border-radius:999px;border:1px solid var(--line);background:var(--paper);
+  display:grid;place-items:center;color:var(--muted)}
+.sheetx svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+#sheetCounter{padding-bottom:0}
+#sheetCounter .actions{position:sticky;bottom:0;z-index:2;background:var(--card);margin-top:0;
+  padding:12px 0 calc(16px + env(safe-area-inset-bottom,0px))}
 .field{display:block;margin-bottom:14px}
 .field span{display:block;font-size:13.5px;color:var(--muted);font-weight:600;margin-bottom:6px}
 .field input[type=text]{width:100%;padding:12px 14px;border-radius:13px;border:1px solid var(--line);
   background:var(--paper);font-size:16px}
-.swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:8px}
-@media (max-width:420px){.swatches{grid-template-columns:repeat(6,1fr)}}
-.sw{aspect-ratio:1;border-radius:11px;border:2px solid transparent;position:relative}
+.swatches{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;max-width:380px;margin-bottom:8px}
+.sw{aspect-ratio:1;border-radius:8px;border:2px solid transparent;position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
 .sw[aria-pressed="true"]{border-color:var(--ink)}
-.sw[aria-pressed="true"]::after{content:"";position:absolute;inset:0;margin:auto;width:7px;height:7px;
-  border-radius:99px;background:rgba(15,25,35,.5)}
+.sw[aria-pressed="true"]::after{content:"";position:absolute;inset:0;margin:auto;width:6px;height:6px;
+  border-radius:99px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.5)}
 .swlabel{font-size:12.5px;color:var(--muted);font-weight:650;margin:2px 0 7px}
 .customrow{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .customrow input[type=color]{width:42px;height:34px;padding:0;border:1px solid var(--line);border-radius:9px;background:none}
@@ -364,13 +378,13 @@ button{background:none;border:0;padding:0;cursor:pointer}
       <span style="font-size:13.5px;color:var(--muted)">or pick your own</span>
     </div>
   </div>
-  <div class="actions">
-    <button class="btn-quiet" id="cCancel">Cancel</button>
-    <button class="btn-primary" id="cSave">Add task</button>
-  </div>
   <div class="linkrow" id="cEditExtras" hidden>
     <button class="linkbtn" id="cReset">Clear today</button>
     <button class="linkbtn danger" id="cDelete">Delete task</button>
+  </div>
+  <div class="actions">
+    <button class="btn-quiet" id="cCancel">Cancel</button>
+    <button class="btn-primary" id="cSave">Add task</button>
   </div>
 </div>
 
@@ -430,9 +444,9 @@ button{background:none;border:0;padding:0;cursor:pointer}
 (function(){
 "use strict";
 
-var PASTELS = ["#F6C7BD","#F7DDA6","#E5E5A8","#C6E5B4","#B4E1D8","#BCD7F2","#CEC8EF","#F2C5DE"];
-var MID     = ["#ED9C8C","#ECBC6A","#C0CA76","#8AC290","#71C0B6","#7EABDD","#A598DA","#DE8CB6"];
-var DEEP    = ["#E4705C","#E09A2E","#9BAF45","#4FA06B","#2E9E93","#3F7FC8","#7C68C4","#C9538F"];
+var PASTELS = ["#F6C7BD","#F7DDA6","#E5E5A8","#C6E5B4","#B4E1D8","#BCD7F2","#CEC8EF","#F2C5DE","#FFF3A3","#FFFFFF"];
+var MID     = ["#ED9C8C","#ECBC6A","#C0CA76","#8AC290","#71C0B6","#7EABDD","#A598DA","#DE8CB6","#F7D54A","#9AA5AF"];
+var DEEP    = ["#E4705C","#E09A2E","#9BAF45","#4FA06B","#2E9E93","#3F7FC8","#7C68C4","#C9538F","#F2BE00","#15181C"];
 var DEFAULT_COLOR = PASTELS[4];
 var KEY = "tallyCounter.v1";
 
@@ -563,6 +577,18 @@ function inkOn(hex){
   var L = 0.2126*lin[0] + 0.7152*lin[1] + 0.0722*lin[2];
   return L > 0.30 ? "#18212B" : "#FFFFFF";
 }
+function lumOf(hex){
+  var c = rgbOf(hex).map(function(v){ v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+// White and black tasks would vanish against the card, so the calendar uses visible neighbours of them.
+function calColor(hex){
+  var L = lumOf(hex);
+  if (L > 0.85) return "#C5CDD5";
+  if (L < 0.03) return "#56626F";
+  return hex;
+}
+
 /* ---------- tasks (daily checklist) ---------- */
 var selecting = false, selected = {};
 var SVG_CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
@@ -787,11 +813,17 @@ function updateSelectUI(){
   $("selDelete").disabled = !n;
   $("selAll").textContent = (all && n === all) ? "Clear" : "Select all";
 }
-function setSelecting(on){
+function applySelecting(on){
   selecting = on; selected = {};
   $("footNormal").hidden = on;
   $("footSelect").hidden = !on;
   renderCounters(); updateSelectUI();
+}
+function setSelecting(on){
+  if (on === selecting) return;
+  applySelecting(on);
+  if (on) pushLayer("select", function(){ applySelecting(false); });
+  else dropLayer("select");
 }
 function toggleSelect(id){
   if (selected[id]) delete selected[id]; else selected[id] = true;
@@ -824,18 +856,32 @@ function renderLog(){
 }
 
 /* ---------- actions ---------- */
-function setMode(m){
-  if (selecting && m !== "multi") setSelecting(false);
+var MODES = ["multi", "cal", "tap"];
+function applyMode(m, dir){
   state.mode = m;
   try{ localStorage.setItem(KEY + ".mode", m); }catch(e){}
   $("mMulti").setAttribute("aria-pressed", m === "multi" ? "true" : "false");
   $("mCal").setAttribute("aria-pressed", m === "cal" ? "true" : "false");
   $("mTap").setAttribute("aria-pressed", m === "tap" ? "true" : "false");
-  $("screenMulti").classList.toggle("active", m === "multi");
-  $("screenCal").classList.toggle("active", m === "cal");
-  $("screenTap").classList.toggle("active", m === "tap");
+  var scr = { multi: $("screenMulti"), cal: $("screenCal"), tap: $("screenTap") };
+  MODES.forEach(function(k){
+    scr[k].classList.toggle("active", k === m);
+    scr[k].classList.remove("slide-fwd", "slide-back");
+  });
+  if (dir) scr[m].classList.add(dir === "fwd" ? "slide-fwd" : "slide-back");
   if (m === "multi") renderCounters();
   if (m === "cal") renderCalendar();
+}
+// Today is the home screen. Days and Tap sit on top of it in the history, so the back button
+// returns to Today before it leaves the app.
+function setMode(m){
+  if (m === state.mode) return;
+  if (selecting) setSelecting(false);
+  var dir = MODES.indexOf(m) > MODES.indexOf(state.mode) ? "fwd" : "back";
+  var hasTab = layers.some(function(l){ return l.kind === "tab"; });
+  applyMode(m, dir);
+  if (m === "multi"){ if (hasTab) dropLayer("tab"); }
+  else if (!hasTab) pushLayer("tab", function(){ applyMode("multi", "back"); });
 }
 function tapBump(delta){
   var next = state.tap.value + delta;
@@ -843,15 +889,70 @@ function tapBump(delta){
   state.tap.value = next; renderTap(); tick(); persist();
 }
 
+/* ---------- back button ---------- */
+// Every pop-up, the select mode and the Days/Tap tabs add one history entry, so the phone's back
+// button undoes the top one instead of leaving the app. Closing in the app removes the entry again.
+var layers = [], ignorePop = 0, deferredPush = 0, popTimer = 0;
+function pushLayer(kind, undo){
+  layers.push({ kind: kind, undo: undo });
+  if (ignorePop > 0){ deferredPush++; return; }
+  try{ history.pushState({ layer: layers.length }, ""); }catch(e){}
+}
+function flushPushes(){
+  clearTimeout(popTimer);
+  while (deferredPush > 0){
+    deferredPush--;
+    try{ history.pushState({ layer: layers.length }, ""); }catch(e){}
+  }
+}
+function dropLayer(kind){
+  for (var i = layers.length - 1; i >= 0; i--){
+    if (layers[i].kind !== kind) continue;
+    layers.splice(i, 1);
+    ignorePop++;
+    clearTimeout(popTimer);
+    popTimer = setTimeout(function(){ ignorePop = 0; flushPushes(); }, 700);
+    try{ history.back(); }catch(e){ ignorePop--; }
+    return;
+  }
+}
+window.addEventListener("popstate", function(){
+  if (ignorePop > 0){
+    ignorePop--;
+    if (ignorePop === 0) flushPushes();
+    return;
+  }
+  var l = layers.pop();
+  if (l) l.undo();
+});
+
 var openSheetEl = null;
 function openSheet(el){
-  if (openSheetEl) openSheetEl.classList.remove("open");
+  var already = !!openSheetEl;
+  if (already) openSheetEl.classList.remove("open");
   openSheetEl = el; el.classList.add("open"); $("scrim").classList.add("open");
+  if (!already) pushLayer("sheet", hideSheet);
 }
-function closeSheet(){
+function hideSheet(){
   if (openSheetEl) openSheetEl.classList.remove("open");
   openSheetEl = null; $("scrim").classList.remove("open");
 }
+function closeSheet(){
+  if (!openSheetEl) return;
+  hideSheet(); dropLayer("sheet");
+}
+// A close button in every sheet's title row, so it never has to be dismissed by tapping outside.
+Array.prototype.forEach.call(document.querySelectorAll(".sheet"), function(sh){
+  var h = sh.querySelector("h2");
+  if (!h) return;
+  var head = document.createElement("div"); head.className = "sheethead";
+  sh.insertBefore(head, h); head.appendChild(h);
+  var x = document.createElement("button"); x.className = "sheetx";
+  x.setAttribute("aria-label", "Close");
+  x.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  x.addEventListener("click", closeSheet);
+  head.appendChild(x);
+});
 $("scrim").addEventListener("click", closeSheet);
 document.addEventListener("keydown", function(e){
   if (e.key !== "Escape") return;
@@ -893,7 +994,7 @@ function openCounterSheet(id){
   $("cSave").textContent = c ? "Save changes" : "Add task";
   $("cName").value = c ? c.name : "";
   $("cTag").value = c ? c.tag : "";
-  pickedColor = c ? c.color : PASTELS[Math.floor(Math.random() * PASTELS.length)];
+  pickedColor = c ? c.color : PASTELS[Math.floor(Math.random() * 8)];
   pickedFreq = c ? c.freq : 1;
   syncSwatches(); syncFreq();
   $("cEditExtras").hidden = !c;
@@ -1180,7 +1281,7 @@ function renderCalendar(){
   $("calTitle").textContent = MONTHS[calView.m] + " " + calView.y;
 
   var one = calSel !== "all" ? list[0] : null;
-  var base = one ? one.color : accentHex();
+  var base = one ? calColor(one.color) : accentHex();
   var grid = $("calGrid"); grid.textContent = "";
   var first = new Date(calView.y, calView.m, 1).getDay();
   var count = new Date(calView.y, calView.m + 1, 0).getDate();
@@ -1296,10 +1397,37 @@ if ("serviceWorker" in navigator){
   window.addEventListener("load", function(){ navigator.serviceWorker.register("/sw.js").catch(function(){}); });
 }
 
+// Swipe sideways to move between Today and Days. The Tap screen is left out because its whole
+// surface counts taps, and gestures that start on the reorder handle, the task chips, a field or a
+// sheet are left alone.
+(function(){
+  var sx = 0, sy = 0, st = 0, tracking = false;
+  var app = $("app");
+  app.addEventListener("touchstart", function(e){
+    tracking = false;
+    if (e.touches.length !== 1 || openSheetEl || selecting || state.mode === "tap") return;
+    var t = e.target;
+    if (t.closest && t.closest(".grip, .chips, input, .sheet")) return;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now();
+    if (sx < 24 || sx > window.innerWidth - 24) return;   // leave the phone's own edge gestures alone
+    tracking = true;
+  }, { passive: true });
+  app.addEventListener("touchend", function(e){
+    if (!tracking) return;
+    tracking = false;
+    var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Date.now() - st > 800 || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.7) return;
+    if (dx < 0 && state.mode === "multi") setMode("cal");
+    else if (dx > 0 && state.mode === "cal") setMode("multi");
+  }, { passive: true });
+  app.addEventListener("touchcancel", function(){ tracking = false; }, { passive: true });
+})();
+
 load();
 buildSwatches();
 buildCalendar();
-setMode(state.mode);
+applyMode(state.mode);
+if (state.mode !== "multi") pushLayer("tab", function(){ applyMode("multi", "back"); });
 renderTap();
 renderCounters();
 renderLog();
